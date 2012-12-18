@@ -1,3 +1,7 @@
+Codeswitchador was developed as a part of the SCALE 2012 summer workshop at the
+Johns Hopkins Human Language Technology Center of Excellence.
+
+
 Runnable shell scripts
 =======================
 * make_ratiolist.sh: qsub-able wrapper for freqratio.py

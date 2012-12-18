@@ -1,0 +1,10 @@
+# Editors
+*~
+*.swp
+
+# Python
+*.py[cod]
+
+# Java
+*.class
+*.jar

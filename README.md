@@ -18,7 +18,7 @@ lidlists.py: Wordlists and paths used by idiotLID and wordlist-based models.
 scalereader.py: Support for reading from common SCALE file formats (e.g., Jerboa output).
 wordlistlid.py: Wordlist-based LID/CS models.
 
-The basics
+The Basics
 ==========
 Most common things you'll need to do:
 1. Create wordlists. See:
@@ -26,3 +26,8 @@ tools/make_eng_wordlist.sh
 tools/make_spa_wordlist.sh
 
 TODO: More things here!
+
+License
+=======
+Codeswitchador is distributed under the Simplified BSD License. See
+LICENSE for more information.

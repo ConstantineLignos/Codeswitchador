@@ -80,12 +80,22 @@ def split_token(tokentag, remove_entities=True):
     tag = tokentag[lastslash + 1:]
     if not tag or not token:
         raise ValueError("Bad token/tag: %r" % tokentag)
-    if remove_entities and ENTITY_CHARS_RE.search(tag):
+    if remove_entities and contains_entity(tag):
         # You can't do deletion on unicode strings with a translation table, alas
-        tag = ENTITY_CHARS_RE.sub('', tag)
+        tag = clean_entities(tag)
         if len(tag) != 1:
             raise ValueError("Bad tag %r from %r." % (tag, tokentag))
     return (token, tag)
+
+
+def contains_entity(tag):
+    """Return whether this tag contains an entity."""
+    return bool(ENTITY_CHARS_RE.search(tag))
+
+
+def clean_entities(tag):
+    """Remove any entity markings from a tag."""
+    return ENTITY_CHARS_RE.sub('', tag)
 
 
 class AnnotatedTweetReader(object):
@@ -108,7 +118,7 @@ class AnnotatedTweetReader(object):
 
 def _valid_langs_set(langs):
     """Return the set number of valid langs in a sequence of langs."""
-    valid_langs = set(LANG_ABBREVIATIONS[lang] for lang in langs)
+    valid_langs = set(LANG_ABBREVIATIONS[clean_entities(lang)] for lang in langs)
     # Remove None, as it represents invalid langs
     valid_langs.discard(None)
     return valid_langs
@@ -131,14 +141,14 @@ def _tokens_tags_langs(infile, mode, annotated):
         for line in infile:
             tokens = line.strip().split()
             if annotated:
-                tokens, gold_langs = zip(*[split_token(token) for token in tokens])
+                tokens, gold_langs = zip(*[split_token(token, False) for token in tokens])
                 yield (tokens, None, gold_langs, None, None)
             else:
                 yield (tokens, None, None, None, None)
 
 
-def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat, annotated, n_folds,
-             quiet=False):
+def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat, annotated,
+             ignore_entities, n_folds, quiet=False):
     """Annotate tokens in the file."""
     assert(informat == FORMAT_LOG or model in SUPPORTED_MODELS)
     verbose = False
@@ -238,9 +248,12 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
             if token_eval:
                 # Individual tokens
                 for pred_lang, gold_lang, token in zip(out_langs, gold_langs, tokens_lower):
-                    if gold_lang not in (NO_LANG, 'o') and pred_lang != NO_LANG:
-                        token_acc.score(pred_lang, gold_lang, token.lower())
-                        fold_token_acc.score(pred_lang, gold_lang, token.lower())
+                    # Clean gold_lang of entities
+                    gold_lang_clean = clean_entities(gold_lang)
+                    if (gold_lang_clean not in (NO_LANG, 'o') and pred_lang != NO_LANG and
+                        (not ignore_entities or not contains_entity(gold_lang))):
+                        token_acc.score(pred_lang, gold_lang_clean, token.lower())
+                        fold_token_acc.score(pred_lang, gold_lang_clean, token.lower())
 
                 # Codeswitch points
                 last_pred_lang = None
@@ -384,6 +397,7 @@ def main():
     parser.add_argument('-a', '--annotated', action='store_true', help='input is already annotated. '
                         'Needs to be specified for the plain format; log is assumed to be '
                         'annotated while Jerboa is assumed to not be.')
+    parser.add_argument('-e', '--ignore-entity', action='store_true', help='ignore tokens with entity markers')
     parser.add_argument('format', choices=FORMATS,
                         help="format of the input. Plain: Lines of tokens in word/tag format, "
                         "Log: TSV logfile from the output of process_codeswitch with annotation, "
@@ -437,7 +451,7 @@ def main():
         outfile = codecs.getwriter('utf-8')(sys.stdout)
         sys.stderr = codecs.getwriter('utf_8')(sys.stderr)
         annotate(args.model, args.file, outfile, args.ratio, args.lowmethod, args.unkmethod, args.format,
-                 args.annotated, args.folds)
+                 args.annotated, args.ignore_entity, args.folds)
     else:
         if not args.annotated:
             print "Error: Can't sweep without annotated data."
@@ -451,14 +465,14 @@ def main():
                 # No params to mess with
                 eval_rows.append(("Model_" + model,
                     annotate(model, args.file, None, args.ratio, None, None, args.format, 
-                             args.annotated, args.folds, True)))
+                             args.annotated, args.ignore_entity, args.folds, True)))
                 sys.stdout.flush()
             else:
                 for lowmethod, unkmethod in product(LOW_METHODS, UNK_METHODS):
                     print >> sys.stderr, "Evaluating params low: %s, unk: %s..." % (lowmethod, unkmethod)
                     eval_rows.append(("_".join(["Model", model, lowmethod, unkmethod]),
                         annotate(model, args.file, None, args.ratio, lowmethod, unkmethod, args.format, 
-                                 args.annotated, args.folds, True)))
+                                 args.annotated, args.ignore_entity, args.folds, True)))
                     sys.stdout.flush()
 
         headers = ["Model", "All LID Accuracy", "Non-CS LID Accuracy", "CS Precision", "CS Recall",

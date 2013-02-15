@@ -8,3 +8,11 @@
 # Java
 *.class
 *.jar
+
+# Folders
+oldtools
+data
+
+# Data
+*.tsv
+*.csv

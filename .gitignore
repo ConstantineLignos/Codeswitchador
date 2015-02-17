@@ -16,3 +16,6 @@ data
 # Data
 *.tsv
 *.csv
+
+# Build
+/target/

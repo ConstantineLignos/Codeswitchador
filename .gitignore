@@ -1,21 +1,28 @@
-# Editors
-*~
-*.swp
+# IntelliJ IDEA
+/.idea
+*.iml
 
-# Python
-*.py[cod]
-
-# Java
-*.class
-*.jar
-
-# Folders
-oldtools
-data
+# R
+*.Rproj
+.RData
+.RHistory
+.Rproj.user
 
 # Data
 *.tsv
 *.csv
+*.txt
+
+# Figures
+*.pdf
+*.png
 
 # Build
-/target/
+/target
+
+# Editors
+*.swp
+*~
+
+# OS X
+.DS_Store

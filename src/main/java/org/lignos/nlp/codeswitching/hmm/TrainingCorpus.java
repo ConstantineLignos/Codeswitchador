@@ -70,7 +70,7 @@ public class TrainingCorpus extends Corpus {
                 // Increment emissions
                 if (emissions != null) {
                     TokenCounts stateEmissions = emissions.get(tokenState.state);
-                    stateEmissions.incrementCount(tokenState.token.toLowerCase(), 1);
+                    stateEmissions.incrementCount(tokenState.token, 1);
                 }
 			}
 		}

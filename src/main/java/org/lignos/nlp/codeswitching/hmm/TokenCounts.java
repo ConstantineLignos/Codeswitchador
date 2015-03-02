@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Representation of tokens and their frequencies.
+ * Representation of tokens and their frequencies. All tokens are normalized to lowercase form.
  */
 public class TokenCounts {
 	private Map<String, Integer> wordCounts;
@@ -66,7 +66,7 @@ public class TokenCounts {
      * @param count the count
      */
 	public void incrementCount(String token, int count){
-		wordCounts.put(token, wordCounts.getOrDefault(token, 0) + count);
+		wordCounts.put(token, wordCounts.getOrDefault(token.toLowerCase(), 0) + count);
 		totalCount += count;
 	}
 
@@ -76,7 +76,7 @@ public class TokenCounts {
      * @return the count
      */
 	public int getCount(String token) {
-		Integer count = wordCounts.get(token);
+		Integer count = wordCounts.get(token.toLowerCase());
 		return count != null ? count : 0;
 	}
 
@@ -86,7 +86,7 @@ public class TokenCounts {
      * @return the count
      */
     public double getFreq(String token) {
-		return getCount(token) / (double) totalCount;
+		return getCount(token.toLowerCase()) / (double) totalCount;
 	}
 
     /**

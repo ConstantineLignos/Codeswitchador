@@ -23,6 +23,9 @@ public class SequenceEvaluator {
     private int total;
     private float accuracy;
     private float oovRate;
+    private int oovHits;
+    private int oovMisses;
+    private float oovAccuracy;
 
     // Per-label
     private Map<String, Integer> labelHits;
@@ -123,11 +126,6 @@ public class SequenceEvaluator {
                     continue;
                 }
 
-                // Count OOV
-                if (!trainCounts.containsKey(gold.token)) {
-                    oov++;
-                }
-
                 // Overall accuracy
                 if (gold.state.equals(pred.state)) {
                     hits++;
@@ -136,12 +134,24 @@ public class SequenceEvaluator {
                     misses++;
                     labelMisses.put(gold.state, labelMisses.getOrDefault(gold.state, 0) + 1);
                 }
+
+                // Count OOV
+                if (!trainCounts.containsKey(gold.token)) {
+                    oov++;
+                    // OOV accuracy
+                    if (gold.state.equals(pred.state)) {
+                        oovHits++;
+                    } else {
+                        oovMisses++;
+                    }
+                }
             }
         }
         // Update accuracy
         total = hits + misses;
         accuracy = (float) hits / total;
         oovRate = (float) oov /total;
+        oovAccuracy = (float) oovHits / oov;
         // TODO: In theory this could miss a class if it had only misses and no hits
         for(String label : labelHits.keySet()) {
             int labelCount = labelHits.get(label) + labelMisses.get(label);
@@ -153,7 +163,7 @@ public class SequenceEvaluator {
     /** Print the results of evaluation */
     public void printResults() {
         System.out.println("Accuracy: " + accuracy + " (" + hits + "/" + total + ")");
-        System.out.println();
+        System.out.println("OOV accuracy: " + oovAccuracy + " (" + oovHits + "/" + oov + ")");
         System.out.println("Class accuracies:");
         for (String label : labelAccuracy.keySet()) {
             System.out.println(label + ": " + labelAccuracy.get(label));
@@ -180,6 +190,10 @@ public class SequenceEvaluator {
 
     public float getAccuracy() {
         return accuracy;
+    }
+
+    public float getOovAccuracy() {
+        return oovAccuracy;
     }
 
     public float getOovRate() {

@@ -47,7 +47,7 @@ public class PerceptronCodeswitchadorEval {
         long startTime = System.nanoTime();
 
         // Open an output CSV
-        String csvPath = Paths.get(outDirPath, "perf.csv").toString();
+        String csvPath = Paths.get(outDirPath, "perf_perceptron.csv").toString();
         PrintWriter csv = null;
         try {
             // Make the parent directories as needed
@@ -87,7 +87,7 @@ public class PerceptronCodeswitchadorEval {
         try {
             pool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
             // Write the output
-            csv.println("Features,Name,Accuracy,OOV");
+            csv.println("Features,Name,Accuracy,OOV,OOVAccuracy");
             for (String line : outputLines) {
                 csv.println(line);
             }
@@ -140,7 +140,7 @@ public class PerceptronCodeswitchadorEval {
             System.out.println();
 
             output.add(featureName + "," + trainName + "," + eval.getAccuracy() + "," +
-                    eval.getOovRate());
+                    eval.getOovRate() + "," + eval.getOovAccuracy());
         }
     }
 

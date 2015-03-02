@@ -12,6 +12,7 @@
 *.tsv
 *.csv
 *.txt
+/data
 
 # Figures
 *.pdf

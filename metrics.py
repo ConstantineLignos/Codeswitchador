@@ -85,8 +85,8 @@ class Accuracy(object):
     def __str__(self):
         return "\n".join([
                 "Gold standard of {0} items".format(len(self)),
-                "Accuracy: {0:.3f}".format(self.accuracy),
-                "Baseline accuracy: {0:.3f}".format(self.baseline_accuracy)])
+                "Accuracy: {0:.4f}".format(self.accuracy),
+                "Baseline accuracy: {0:.4f}".format(self.baseline_accuracy)])
 
     def __repr__(self):
         return "<Accuracy with %s observations>" % len(self)

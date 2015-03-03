@@ -35,8 +35,6 @@ public class Sequence implements Iterable<TokenState> {
 			// Replace entity marks on tag
 			tag = tag.replaceAll("t", "");
 			tag = tag.replaceAll("p", "");
-			// Replace extra h's from other
-			tag = tag.replaceAll("h", "");
 			if (tag.length() != 1) {
 				throw new MalformedSequenceException("Tag is of unexpected length: " + tag);
 			}

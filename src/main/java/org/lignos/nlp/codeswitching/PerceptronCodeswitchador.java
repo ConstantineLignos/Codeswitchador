@@ -3,6 +3,7 @@ package org.lignos.nlp.codeswitching;
 import org.lignos.nlp.codeswitching.features.CodeswitchFeatureSet;
 import org.lignos.nlp.ml.Perceptron;
 import org.lignos.nlp.sequence.SequenceCorpusReader;
+import org.lignos.nlp.sequence.SequenceEvaluator;
 import org.lignos.nlp.util.StringUtil;
 
 import java.io.File;
@@ -73,18 +74,29 @@ public class PerceptronCodeswitchador {
         PerceptronCodeswitchador codeswitchador = getFromPaths(
                 trainPath, testPath, featurePath);
         codeswitchador.run(iterations, outPath);
+
+        // Perform proper evaluation
+        SequenceEvaluator eval = SequenceEvaluator.getFromPaths(testPath, outPath, trainPath);
+        eval.eval(true);
+        System.out.println("Evaluation:");
+        eval.printResults();
     }
 
     public void run(int trainingIterations, String outPath) {
+        // Track training time
         long startTime = System.nanoTime();
 
         // Create and train perceptron
         Perceptron perc = new Perceptron(featureSet, GREEDY_DECODE, AVERAGED);
+        System.out.println("Training...");
         float[] accuracies = perc.train(trainingIterations, trainReader, TRAIN_DEBUG);
-        System.out.println("Training accuracy:");
+        System.out.println("All tokens training accuracy:");
         for (int i = 0; i < accuracies.length; i++) {
             System.out.println((i + 1) + "\t" + accuracies[i]);
         }
+
+        long elapsed = System.nanoTime() - startTime;
+        System.out.println("Training time: " + TimeUnit.NANOSECONDS.toSeconds(elapsed) + " seconds");
 
         // Test
         PrintWriter output = null;
@@ -102,13 +114,8 @@ public class PerceptronCodeswitchador {
         }
         float accuracy = perc.test(testReader, output);
         output.close();
-        System.out.println("Testing accuracy:");
+        System.out.println("All tokens testing accuracy:");
         System.out.println(accuracy);
         System.out.println();
-
-        long elapsed = System.nanoTime() - startTime;
-        System.out.println("Elapsed time: " + TimeUnit.NANOSECONDS.toSeconds(elapsed) + " seconds");
     }
-
-
 }

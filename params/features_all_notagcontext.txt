@@ -1,0 +1,9 @@
+token0
+token-1
+token+1
+char1
+char2
+char3
+char4
+length
+suffix

@@ -1,0 +1,10 @@
+250 data/twothirds/train_250.txt
+500 data/twothirds/train_500.txt
+750 data/twothirds/train_750.txt
+1000 data/twothirds/train_1000.txt
+1250 data/twothirds/train_1250.txt
+1500 data/twothirds/train_1500.txt
+1750 data/twothirds/train_1750.txt
+2000 data/twothirds/train_2000.txt
+2250 data/twothirds/train_2250.txt
+2450 data/twothirds/train_2450.txt

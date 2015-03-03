@@ -1,0 +1,6 @@
+All    params/features_all.txt
+Nochar	params/features_all_nochar.txt
+Nolength	params/features_all_nolength.txt
+Nosuffix	params/features_all_nosuffix.txt
+Notagcontext	params/features_all_notagcontext.txt
+Notokencontext	params/features_all_notokencontext.txt

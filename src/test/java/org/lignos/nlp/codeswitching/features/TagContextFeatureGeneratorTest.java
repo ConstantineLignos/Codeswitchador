@@ -14,7 +14,7 @@ import java.util.List;
 */
 public class TagContextFeatureGeneratorTest {
 
-    private List<String> list;
+    private List<String> features;
 
     @Before
     public void before() throws Exception {
@@ -34,19 +34,16 @@ public class TagContextFeatureGeneratorTest {
 
         TagContextFeatureGenerator gen1 = new TagContextFeatureGenerator(-1);
 
-        list = new LinkedList<String>();
-        gen1.addLabelFeatures(labels, 1, list);
-        assertArrayEquals(new String[]{"TAG-1:a"}, list.toArray());
+        features = gen1.genLabelFeatures(labels, 1);
+        assertArrayEquals(new String[]{"TAG-1:a"}, features.toArray());
 
-        list = new LinkedList<String>();
-        gen1.addLabelFeatures(labels, 2, list);
-        assertArrayEquals(new String[]{"TAG-1:b"}, list.toArray());
+        features = gen1.genLabelFeatures(labels, 2);
+        assertArrayEquals(new String[]{"TAG-1:b"}, features.toArray());
 
         TagContextFeatureGenerator gen2 = new TagContextFeatureGenerator(-2);
 
-        list = new LinkedList<String>();
-        gen2.addLabelFeatures(labels, 2, list);
-        assertArrayEquals(new String[] {"TAG-2:a"}, list.toArray());
+        features = gen2.genLabelFeatures(labels, 2);
+        assertArrayEquals(new String[] {"TAG-2:a"}, features.toArray());
     }
 
     /**
@@ -59,18 +56,15 @@ public class TagContextFeatureGeneratorTest {
 
         TagContextFeatureGenerator gen1 = new TagContextFeatureGenerator(-1);
 
-        list = new LinkedList<String>();
-        gen1.addLabelFeatures(labels, 0, list);
-        assertTrue(list.isEmpty());
+        features = gen1.genLabelFeatures(labels, 0);
+        assertTrue(features.isEmpty());
 
         TagContextFeatureGenerator gen2 = new TagContextFeatureGenerator(-2);
 
-        list = new LinkedList<String>();
-        gen2.addLabelFeatures(labels, 0, list);
-        assertTrue(list.isEmpty());
+        features = gen2.genLabelFeatures(labels, 0);
+        assertTrue(features.isEmpty());
 
-        list = new LinkedList<String>();
-        gen2.addLabelFeatures(labels, 1, list);
-        assertTrue(list.isEmpty());
+        features = gen2.genLabelFeatures(labels, 1);
+        assertTrue(features.isEmpty());
     }
 }

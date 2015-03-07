@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.After;
 import org.lignos.nlp.sequence.Sequence;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,7 +14,7 @@ import java.util.List;
 */
 public class SuffixFeatureGeneratorTest {
 
-    private List<String> list;
+    private List<String> features;
 
     @Before
     public void before() throws Exception {
@@ -37,17 +36,14 @@ public class SuffixFeatureGeneratorTest {
         SuffixFeatureGenerator gen = new SuffixFeatureGenerator(1, 4, 3);
 
         // Too short for any features
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 0, list);
-        assertTrue(list.isEmpty());
+        features = gen.genTokenFeatures(seq, 0);
+        assertTrue(features.isEmpty());
 
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 1, list);
-        assertTrue(list.isEmpty());
+        features = gen.genTokenFeatures(seq, 1);
+        assertTrue(features.isEmpty());
 
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 2, list);
-        assertTrue(list.isEmpty());
+        features = gen.genTokenFeatures(seq, 2);
+        assertTrue(features.isEmpty());
     }
 
     /**
@@ -60,21 +56,17 @@ public class SuffixFeatureGeneratorTest {
         Sequence seq = new Sequence("aaab/a aaabc/a aaabcd/a aaabcde/a", false);
         SuffixFeatureGenerator gen = new SuffixFeatureGenerator(1, 4, 3);
 
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 0, list);
-        assertArrayEquals(new String[]{"SUFFIX:b"}, list.toArray());
+        features = gen.genTokenFeatures(seq, 0);
+        assertArrayEquals(new String[]{"SUFFIX:b"}, features.toArray());
 
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 1, list);
-        assertArrayEquals(new String[]{"SUFFIX:c", "SUFFIX:bc"}, list.toArray());
+        features = gen.genTokenFeatures(seq, 1);
+        assertArrayEquals(new String[]{"SUFFIX:c", "SUFFIX:bc"}, features.toArray());
 
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 2, list);
-        assertArrayEquals(new String[]{"SUFFIX:d", "SUFFIX:cd", "SUFFIX:bcd"}, list.toArray());
+        features = gen.genTokenFeatures(seq, 2);
+        assertArrayEquals(new String[]{"SUFFIX:d", "SUFFIX:cd", "SUFFIX:bcd"}, features.toArray());
 
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 3, list);
+        features = gen.genTokenFeatures(seq, 3);
         assertArrayEquals(new String[]{"SUFFIX:e", "SUFFIX:de", "SUFFIX:cde", "SUFFIX:bcde"},
-                list.toArray());
+                features.toArray());
     }
 }

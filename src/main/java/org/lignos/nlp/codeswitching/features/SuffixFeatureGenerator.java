@@ -3,6 +3,7 @@ package org.lignos.nlp.codeswitching.features;
 import org.lignos.nlp.sequence.TokenSequenceFeatureGenerator;
 import org.lignos.nlp.sequence.Sequence;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,7 +29,8 @@ public class SuffixFeatureGenerator extends TokenSequenceFeatureGenerator {
     }
 
     @Override
-    public void addTokenFeatures(Sequence seq, int index, List<String> features) {
+    public List<String> genTokenFeatures(Sequence seq, int index) {
+        List<String> features = new LinkedList<String>();
         String token = seq.get(index).token;
         for (int i = minSuffixLength; i <= maxSuffixLength; i++) {
             int startIdx = token.length() - i;
@@ -40,5 +42,6 @@ public class SuffixFeatureGenerator extends TokenSequenceFeatureGenerator {
                 features.add("SUFFIX:" + token.toLowerCase().substring(startIdx, token.length()));
             }
         }
+        return features;
     }
 }

@@ -2,6 +2,7 @@ package org.lignos.nlp.codeswitching.features;
 
 import org.lignos.nlp.sequence.LabelSequenceFeatureGenerator;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -25,11 +26,14 @@ public class TagContextFeatureGenerator extends LabelSequenceFeatureGenerator {
     }
 
     @Override
-    public void addLabelFeatures(String[] labels, int index, List<String> features) {
+    public List<String> genLabelFeatures(String[] labels, int index) {
+        List<String> features = new LinkedList<String>();
+
         // If labels is null, skip
         if (labels == null) {
-            return;
+            return features;
         }
+
         // Compute and check the target index
         int targetIndex = index + relIndex;
         if (targetIndex >= 0 && targetIndex < labels.length) {
@@ -39,5 +43,6 @@ public class TagContextFeatureGenerator extends LabelSequenceFeatureGenerator {
             }
             features.add("TAG" + relIndex + ":" + labels[targetIndex]);
         }
+        return features;
     }
 }

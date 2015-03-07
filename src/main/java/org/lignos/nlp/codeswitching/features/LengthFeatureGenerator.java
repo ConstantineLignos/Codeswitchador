@@ -3,6 +3,7 @@ package org.lignos.nlp.codeswitching.features;
 import org.lignos.nlp.sequence.TokenSequenceFeatureGenerator;
 import org.lignos.nlp.sequence.Sequence;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,7 +16,9 @@ public class LengthFeatureGenerator extends TokenSequenceFeatureGenerator {
      */
 
     @Override
-    public void addTokenFeatures(Sequence seq, int index, List<String> features) {
+    public List<String> genTokenFeatures(Sequence seq, int index) {
+        List<String> features = new LinkedList<String>();
         features.add("LENGTH:" + seq.get(index).token.length());
+        return features;
     }
 }

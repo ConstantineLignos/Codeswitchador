@@ -4,6 +4,7 @@ import org.lignos.nlp.sequence.LabelSequenceFeatureGenerator;
 import org.lignos.nlp.util.StringUtil;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,10 +28,11 @@ public class TagHistoryFeatureGenerator extends LabelSequenceFeatureGenerator {
     }
 
     @Override
-    public void addLabelFeatures(String[] labels, int index, List<String> features) {
+    public List<String> genLabelFeatures(String[] labels, int index) {
+        List<String> features = new LinkedList<String>();
         // If labels is null, skip
         if (labels == null) {
-            return;
+            return features;
         }
         // Compute and check the target index
         int firstIndex = index - historySize;
@@ -38,5 +40,6 @@ public class TagHistoryFeatureGenerator extends LabelSequenceFeatureGenerator {
             String tags = StringUtil.join(Arrays.copyOfRange(labels, firstIndex, index), ",");
             features.add("TAGHIST" + historySize + ":" + tags);
         }
+        return features;
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 */
 public class TokenContextFeatureGeneratorTest {
 
-    private List<String> list;
+    private List<String> features;
 
     @Before
     public void before() throws Exception {
@@ -32,19 +32,16 @@ public class TokenContextFeatureGeneratorTest {
         Sequence seq = new Sequence("a/a b/a c/a", false);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(0);
         // First token
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 0, list);
-        assertArrayEquals(new String[]{"TOK0:a"}, list.toArray());
+        features = gen.genTokenFeatures(seq, 0);
+        assertArrayEquals(new String[]{"TOK0:a"}, features.toArray());
 
         // Middle token
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 1, list);
-        assertArrayEquals(new String[]{"TOK0:b"}, list.toArray());
+        features = gen.genTokenFeatures(seq, 1);
+        assertArrayEquals(new String[]{"TOK0:b"}, features.toArray());
 
         // End token
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 2, list);
-        assertArrayEquals(new String[]{"TOK0:c"}, list.toArray());
+        features = gen.genTokenFeatures(seq, 2);
+        assertArrayEquals(new String[]{"TOK0:c"}, features.toArray());
     }
 
     /**
@@ -54,9 +51,8 @@ public class TokenContextFeatureGeneratorTest {
     public void testGeneratePrevMiddle() throws Exception {
         Sequence seq = new Sequence("a/a b/a c/a", false);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(-1);
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 1, list);
-        assertArrayEquals(new String[]{"TOK-1:a"}, list.toArray());
+        features = gen.genTokenFeatures(seq, 1);
+        assertArrayEquals(new String[]{"TOK-1:a"}, features.toArray());
     }
 
     /**
@@ -66,9 +62,8 @@ public class TokenContextFeatureGeneratorTest {
     public void testGeneratePrevStart() throws Exception {
         Sequence seq = new Sequence("a/a b/a c/a", false);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(-1);
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 0, list);
-        assertArrayEquals(new String[]{}, list.toArray());
+        features = gen.genTokenFeatures(seq, 0);
+        assertArrayEquals(new String[]{}, features.toArray());
     }
 
     /**
@@ -78,9 +73,8 @@ public class TokenContextFeatureGeneratorTest {
     public void testGenerateNextMiddle() throws Exception {
         Sequence seq = new Sequence("a/a b/a c/a", false);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(1);
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 1, list);
-        assertArrayEquals(new String[]{"TOK1:c"}, list.toArray());
+        features = gen.genTokenFeatures(seq, 1);
+        assertArrayEquals(new String[]{"TOK1:c"}, features.toArray());
     }
 
     /**
@@ -90,8 +84,7 @@ public class TokenContextFeatureGeneratorTest {
     public void testGenerateNextEnd() throws Exception {
         Sequence seq = new Sequence("a/a b/a c/a", false);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(1);
-        list = new LinkedList<String>();
-        gen.addTokenFeatures(seq, 2, list);
-        assertArrayEquals(new String[]{}, list.toArray());
+        features = gen.genTokenFeatures(seq, 2);
+        assertArrayEquals(new String[]{}, features.toArray());
     }
 }

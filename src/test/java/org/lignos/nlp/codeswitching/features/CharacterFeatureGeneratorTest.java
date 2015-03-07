@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class CharacterFeatureGeneratorTest {
 
-    private List<String> list;
+    private List<String> features;
     private String[] result;
 
     @Before
@@ -35,20 +35,17 @@ public class CharacterFeatureGeneratorTest {
         Sequence seq = new Sequence("a/a ab/a abc/a", false);
         CharacterFeatureGenerator gen1 = new CharacterFeatureGenerator(1);
 
-        list = new LinkedList<String>();
-        gen1.addTokenFeatures(seq, 0, list);
-        assertArrayEquals(new String[] {"CHAR1:a"}, list.toArray());
+        features = gen1.genTokenFeatures(seq, 0);
+        assertArrayEquals(new String[]{"CHAR1:a"}, features.toArray());
 
         // Note that because the ordering isn't guaranteed to be preserved, we have to test sorted.
-        list = new LinkedList<String>();
-        gen1.addTokenFeatures(seq, 1, list);
-        result = list.toArray(new String[0]);
+        features = gen1.genTokenFeatures(seq, 1);
+        result = features.toArray(new String[0]);
         Arrays.sort(result);
         assertArrayEquals(new String[]{"CHAR1:a", "CHAR1:b"}, result);
 
-        list = new LinkedList<String>();
-        gen1.addTokenFeatures(seq, 2, list);
-        result = list.toArray(new String[0]);
+        features = gen1.genTokenFeatures(seq, 2);
+        result = features.toArray(new String[0]);
         Arrays.sort(result);
         assertArrayEquals(new String[] {"CHAR1:a", "CHAR1:b", "CHAR1:c"}, result);
     }
@@ -61,9 +58,8 @@ public class CharacterFeatureGeneratorTest {
         Sequence seq = new Sequence("abcd/a", false);
         CharacterFeatureGenerator gen2 = new CharacterFeatureGenerator(2);
 
-        list = new LinkedList<String>();
-        gen2.addTokenFeatures(seq, 0, list);
-        result = list.toArray(new String[0]);
+        features = gen2.genTokenFeatures(seq, 0);
+        result = features.toArray(new String[0]);
         Arrays.sort(result);
         assertArrayEquals(new String[]{"CHAR2:ab", "CHAR2:bc", "CHAR2:cd"}, result);
     }

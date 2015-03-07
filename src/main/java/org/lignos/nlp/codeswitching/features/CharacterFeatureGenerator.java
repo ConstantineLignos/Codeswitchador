@@ -4,6 +4,7 @@ import gnu.trove.set.hash.THashSet;
 import org.lignos.nlp.sequence.TokenSequenceFeatureGenerator;
 import org.lignos.nlp.sequence.Sequence;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +27,8 @@ public class CharacterFeatureGenerator extends TokenSequenceFeatureGenerator {
     }
 
     @Override
-    public void addTokenFeatures(Sequence seq, int index, List<String> features) {
+    public List<String> genTokenFeatures(Sequence seq, int index) {
+        List<String> features = new LinkedList<String>();
         // Because we can easily repeat character sequences, we use a set to filter
         Set<String> ngrams = new THashSet<String>();
         String token = seq.get(index).token.toLowerCase();
@@ -34,5 +36,6 @@ public class CharacterFeatureGenerator extends TokenSequenceFeatureGenerator {
             ngrams.add("CHAR" + size + ":" + token.substring(i, i + size));
         }
         features.addAll(ngrams);
+        return features;
     }
 }

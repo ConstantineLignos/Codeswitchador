@@ -34,7 +34,7 @@ public class SequenceFeatureSet {
     public List<String> generateTokenFeatures(Sequence seq, int index) {
         List<String> features = new LinkedList<String>();
         for (TokenSequenceFeatureGenerator generator : tokenGenerators) {
-            generator.addTokenFeatures(seq, index, features);
+            features.addAll(generator.genTokenFeatures(seq, index));
         }
         return features;
     }
@@ -49,7 +49,7 @@ public class SequenceFeatureSet {
     public List<String> generateLabelFeatures(String[] labels, int index) {
         List<String> features = new LinkedList<String>();
         for (LabelSequenceFeatureGenerator generator : labelGenerators) {
-            generator.addLabelFeatures(labels, index, features);
+            features.addAll(generator.genLabelFeatures(labels, index));
         }
         return features;
     }
@@ -65,10 +65,10 @@ public class SequenceFeatureSet {
     public List<String> generateAllFeatures(Sequence seq, String[] labels, int index) {
         List<String> features = new LinkedList<String>();
         for (TokenSequenceFeatureGenerator generator : tokenGenerators) {
-            generator.addTokenFeatures(seq, index, features);
+            features.addAll(generator.genTokenFeatures(seq, index));
         }
         for (LabelSequenceFeatureGenerator generator : labelGenerators) {
-            generator.addLabelFeatures(labels, index, features);
+            features.addAll(generator.genLabelFeatures(labels, index));
         }
         return features;
     }

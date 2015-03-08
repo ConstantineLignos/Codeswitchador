@@ -6,32 +6,19 @@ Constantine Lignos, July 2012
 
 """
 
-# Copyright (c) 2012, Constantine Lignos
-# All rights reserved.
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
+# Copyright 2012-2015 Constantine Lignos
 #
-# 1. Redistributions of source code must retain the above copyright
-# notice, this list of conditions and the following disclaimer.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# 2. Redistributions in binary form must reproduce the above copyright
-#   notice, this list of conditions and the following disclaimer in
-#   the documentation and/or other materials provided with the
-#   distribution.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import division
 import sys
@@ -40,14 +27,14 @@ import argparse
 import re
 from itertools import product, chain
 
-from csvunicode import UnicodeDictReader
-from metrics import Accuracy, SDMetrics
 from tools.kfold import kfolds
-from lidlists import RATIOLIST_DEFAULT_CONFIG
-from lid_constants import NO_LANG, ENGLISH, SPANISH, MULTIPLE_LANGS, ENTITY_TAGS, UNKNOWN_LANG
-from wordlistlid import (choose_lang, LOW_METHODS, UNK_METHODS, MODEL0, MODEL1, MODEL1_5, 
-                         default_lidder, LOW_METHOD_MLE, UNK_METHOD_LEFT)
-from scalereader import JerboaTokenReader, JERBOA_NOTAG
+from codeswitchador.csvunicode import UnicodeDictReader
+from codeswitchador.metrics import Accuracy, SDMetrics
+from codeswitchador.lidlists import RATIOLIST_DEFAULT_CONFIG
+from codeswitchador.lid_constants import NO_LANG, ENGLISH, SPANISH, MULTIPLE_LANGS, ENTITY_TAGS, UNKNOWN_LANG
+from codeswitchador.wordlistlid import (choose_lang, LOW_METHODS, UNK_METHODS, MODEL0, MODEL1, MODEL1_5,
+                                        default_lidder, LOW_METHOD_MLE, UNK_METHOD_LEFT)
+from tools.scalereader import JerboaTokenReader, JERBOA_NOTAG
 
 # Supported file formats
 FORMAT_JERBOA = "jerboa"
@@ -60,8 +47,8 @@ FIELD_TWEET = "tokens"
 FIELD_GOLDLID = "goldlid"
 FIELD_PREDLID = "lidcs"
 LANG_ABBREVIATIONS = {'e': ENGLISH, 's': SPANISH, 'o': None, 'n': None}
-GOLDLID_ABBREVIATIONS = {'e': ENGLISH, 's': SPANISH, 'c': MULTIPLE_LANGS, 'cs': MULTIPLE_LANGS, 
-                         MULTIPLE_LANGS: MULTIPLE_LANGS, ENGLISH: ENGLISH, SPANISH: SPANISH, 
+GOLDLID_ABBREVIATIONS = {'e': ENGLISH, 's': SPANISH, 'c': MULTIPLE_LANGS, 'cs': MULTIPLE_LANGS,
+                         MULTIPLE_LANGS: MULTIPLE_LANGS, ENGLISH: ENGLISH, SPANISH: SPANISH,
                          UNKNOWN_LANG: UNKNOWN_LANG, 'u': UNKNOWN_LANG, 'unk': UNKNOWN_LANG}
 CSVALS = {'c': True, 'e': False, 's': False}
 VALID_CS_LANGS = set(lang for lang, val in LANG_ABBREVIATIONS.items() if val)
@@ -70,6 +57,8 @@ VALID_CS_LANGS = set(lang for lang, val in LANG_ABBREVIATIONS.items() if val)
 SUPPORTED_MODELS = (MODEL0, MODEL1, MODEL1_5)
 
 ENTITY_CHARS_RE = re.compile('[' + ''.join(ENTITY_TAGS) + ']')
+
+
 def split_token(tokentag, remove_entities=True):
     """Split a token into (token, tag)."""
     # Since slashes aren't escaped, we use the rightmost slash
@@ -103,7 +92,7 @@ class AnnotatedTweetReader(object):
 
     def __init__(self, infile):
         self._csv = UnicodeDictReader(infile, delimiter='\t')
-        
+
     def __iter__(self):
         return self
 
@@ -179,16 +168,16 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
     cs_boundaries = SDMetrics()
 
     if n_folds:
-        train_paths, test_paths = kfolds(inpath, n_folds)
+        _, test_paths = kfolds(inpath, n_folds)
         infiles = [_open_infile(inpath, informat) for inpath in test_paths]
     else:
-        infiles =[_open_infile(inpath, informat)]
+        infiles = [_open_infile(inpath, informat)]
 
     fold_accuracies = []
     for infile in infiles:
         # To match the SVM_HMM evaluation, we have a special token accuracy that's reset every fold
         fold_token_acc = Accuracy()
-        for tokens, tags, gold_langs, lid, gold_lid in _tokens_tags_langs(infile, informat, annotated): 
+        for tokens, tags, gold_langs, lid, gold_lid in _tokens_tags_langs(infile, informat, annotated):
             # Put in dummy tags if needed
             if not tags:
                 tags = [JERBOA_NOTAG] * len(tokens)
@@ -206,10 +195,10 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
                 # Don't label anything, just use what we got from the log file
                 verdict = lid == MULTIPLE_LANGS
             elif model == MODEL0:
-                lid, langspresent, hits, verdict = lidder.idlangs(tokens_lower)
-                ratios = out_langs = unk_rate = None
+                lid, _, _, verdict = lidder.idlangs(tokens_lower)
+                ratios = out_langs = None
             else:
-                lid, langspresent, hits, ratios, out_langs, unk_rate, verdict = \
+                lid, _, _, ratios, out_langs, _, verdict = \
                     (lidder.idlangs(tokens_lower, lowmethod, unkmethod, tags) if model == MODEL1_5 else
                      lidder.idlangs(tokens_lower))
 
@@ -219,10 +208,9 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
             if token_eval:
                 # For model 1.0, apply MLE
                 if model == MODEL1:
-                    out_langs = [choose_lang(token, lang, lidder.langs, tag, ratio, lowmethod, 
+                    out_langs = [choose_lang(token, lang, lidder.langs, tag, ratio, lowmethod,
                                              unkmethod, False)
-                         for token, tag, lang, ratio in zip(tokens_lower, tags, out_langs, ratios)]
-
+                                 for token, tag, lang, ratio in zip(tokens_lower, tags, out_langs, ratios)]
 
                 # Carry over NO_LANG labels from the gold standard
                 if gold_langs:
@@ -234,7 +222,7 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
 
                 # Output tokens
                 if not quiet:
-                    out_tokens = ([(token, "{0:1.3f}".format(ratio)) for token, ratio in zip(tokens, ratios)] 
+                    out_tokens = ([(token, "{0:1.3f}".format(ratio)) for token, ratio in zip(tokens, ratios)]
                                   if show_ratio else
                                   zip(tokens, out_langs))
                     print >> outfile, " ".join(["/".join(token_pair) for token_pair in out_tokens])
@@ -269,7 +257,7 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
                         # True label is whenever the language changes, but don't predict codeswitching
                         # if one of the langs was unknown. Since the label's been truncated, we take
                         # the first char of UNKNOWN_LANG.
-                        pred_cs = (pred_lang != UNKNOWN_LANG[0] and last_pred_lang != UNKNOWN_LANG[0] and 
+                        pred_cs = (pred_lang != UNKNOWN_LANG[0] and last_pred_lang != UNKNOWN_LANG[0] and
                                    pred_lang != last_pred_lang)
                         gold_cs = gold_lang != last_gold_lang
                         cs_boundaries.score(pred_cs, gold_cs, (last_token, token))
@@ -308,7 +296,7 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
 
                 # Always record all-way LID
                 nounk_all_lid_acc.score(output_lang, gold_lid)
-        
+
         # Track fold accuracy
         fold_accuracies.append(fold_token_acc.accuracy)
 
@@ -350,7 +338,7 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
             print >> output, '*' * 10 + "Token by token evaluation" + '*' * 10
             print >> output, "Token-by-token LID:"
             print >> output, "Low method:", lowmethod
-            if model != MODEL1: # Model 1 doesn't actually do unk attachment
+            if model != MODEL1:  # Model 1 doesn't actually do unk attachment
                 print >> output, "Unk method:", unkmethod
             print >> output, token_acc
             print >> output, token_acc.confusion_matrix()
@@ -383,9 +371,9 @@ def annotate(model, inpath, outfile, show_ratio, lowmethod, unkmethod, informat,
 def _open_infile(path, informat):
     """Return the correct input for the filename and format specified."""
     if informat == FORMAT_PLAIN:
-        return codecs.open(path, 'Ur', 'utf_8') 
+        return codecs.open(path, 'Ur', 'utf_8')
     else:
-        return open(path, 'Ur') 
+        return open(path, 'Ur')
 
 
 def main():
@@ -464,28 +452,27 @@ def main():
             if model != MODEL1_5:
                 # No params to mess with
                 eval_rows.append(("Model_" + model,
-                    annotate(model, args.file, None, args.ratio, None, None, args.format, 
+                    annotate(model, args.file, None, args.ratio, None, None, args.format,
                              args.annotated, args.ignore_entity, args.folds, True)))
                 sys.stdout.flush()
             else:
                 for lowmethod, unkmethod in product(LOW_METHODS, UNK_METHODS):
                     print >> sys.stderr, "Evaluating params low: %s, unk: %s..." % (lowmethod, unkmethod)
                     eval_rows.append(("_".join(["Model", model, lowmethod, unkmethod]),
-                        annotate(model, args.file, None, args.ratio, lowmethod, unkmethod, args.format, 
+                        annotate(model, args.file, None, args.ratio, lowmethod, unkmethod, args.format,
                                  args.annotated, args.ignore_entity, args.folds, True)))
                     sys.stdout.flush()
 
         headers = ["Model", "All LID Accuracy", "Non-CS LID Accuracy", "CS Precision", "CS Recall",
-                   "CS F1", "CS MCC",  "(No und) All LID Accuracy", "(No und) Non-CS LID Accuracy", 
-                   "(No und) CS Precision", "(No und) CS Recall",  "(No und) CS F1", 
+                   "CS F1", "CS MCC", "(No und) All LID Accuracy", "(No und) Non-CS LID Accuracy",
+                   "(No und) CS Precision", "(No und) CS Recall", "(No und) CS F1",
                    "(No und) CS MCC", "Token Accuracy"]
         print ",".join(headers)
 
         for model, row in eval_rows:
-            perf = [str(item) for item in chain.from_iterable(eval.all_stats for eval in row)]
+            perf = [str(item) for item in chain.from_iterable(eval_.all_stats for eval_ in row)]
             print ",".join([model] + perf)
 
 
 if __name__ == "__main__":
     main()
-

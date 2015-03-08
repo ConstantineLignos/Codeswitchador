@@ -1,9 +1,24 @@
 #!/usr/bin/env python
 """Split a data set into k folds."""
 
+# Copyright 2012-2015 Constantine Lignos
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import sys
 import codecs
 import random
+
 
 def kfolds(inpath, n_folds):
     """Split a file into n_folds train/test folds."""
@@ -24,7 +39,7 @@ def kfolds(inpath, n_folds):
     for line in lines:
         test_idx = (test_idx + 1) % n_folds
         # Write it to test for its index
-        print >> test_outs[test_idx], line.rstrip() 
+        print >> test_outs[test_idx], line.rstrip()
         # Write it to train for all other files
         for train_idx, train_file in enumerate(train_outs):
             if train_idx != test_idx:

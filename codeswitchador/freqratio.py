@@ -6,32 +6,19 @@ Constantine Lignos, June 2012
 
 """
 
-# Copyright (c) 2012, Constantine Lignos
-# All rights reserved.
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
+# Copyright 2012-2015 Constantine Lignos
 #
-# 1. Redistributions of source code must retain the above copyright
-# notice, this list of conditions and the following disclaimer.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# 2. Redistributions in binary form must reproduce the above copyright
-#   notice, this list of conditions and the following disclaimer in
-#   the documentation and/or other materials provided with the
-#   distribution.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import division
 import sys
@@ -41,6 +28,7 @@ from math import log
 from operator import itemgetter
 
 from wordlist import load_counts
+
 
 def _logprobratio(prob1, prob2):
     """Compute log probability ratio of prob1/prob2."""
@@ -61,15 +49,15 @@ def _lidstone_smooth(prob, smoothing, observations, outcomes):
 def _ratio(counter1, counter2, smoothing, min_freq=0):
     """
     Compute the logprobratio of the items in two counters.
-    
+
     @ param counter1 Counter for numerator of ratio
     @ param counter2 Counter for denominator of ratio
     @ param smoothing Value for Lidstone smoothing to be applied over the word distribution
-    @ param min_freq Minimum frequency for an item to included. 
+    @ param min_freq Minimum frequency for an item to included.
     """
     # Ratios dict to be returned
     ratios = {}
-    
+
     # Set up for smoothing
     # The number of outcomes is the number of unique words across the two wordlists
     all_words = set(counter1)
@@ -118,7 +106,7 @@ def prune_ratios(ratios, bad_words):
     """Remove an interable of bad_words from the ratio list."""
     for word in bad_words:
         ratios.pop(word, None)
-    
+
 
 def main():
     """Create a frequency ratio list from two data files."""
@@ -130,17 +118,16 @@ def main():
     args = parser.parse_args()
 
     # Get file or stdin input as utf-8
-    infile1 = codecs.open(args.wordlist1, 'Ur', 'utf_8') 
-    infile2 = codecs.open(args.wordlist2, 'Ur', 'utf_8') 
+    infile1 = codecs.open(args.wordlist1, 'Ur', 'utf_8')
+    infile2 = codecs.open(args.wordlist2, 'Ur', 'utf_8')
 
     # Compute ratio
     ratios, counts1, counts2 = wordlist_ratio(infile1, infile2, args.smooth, args.mincount)
 
     # Output
-    output_ratios(sorted(ratios.items(), key=itemgetter(1)), counts1, counts2, 
+    output_ratios(sorted(ratios.items(), key=itemgetter(1)), counts1, counts2,
                   codecs.getwriter('utf-8')(sys.stdout))
 
 
 if __name__ == "__main__":
     main()
-

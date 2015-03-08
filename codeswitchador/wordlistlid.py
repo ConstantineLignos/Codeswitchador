@@ -3,32 +3,19 @@ A simple approach to Language IDentification (LID).
 
 """
 
-# Copyright (c) 2012, Constantine Lignos
-# All rights reserved.
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
+# Copyright 2012-2015 Constantine Lignos
 #
-# 1. Redistributions of source code must retain the above copyright
-# notice, this list of conditions and the following disclaimer.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# 2. Redistributions in binary form must reproduce the above copyright
-#   notice, this list of conditions and the following disclaimer in
-#   the documentation and/or other materials provided with the
-#   distribution.
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import division
 import codecs
@@ -41,9 +28,8 @@ import numpy
 
 from lid_constants import UNKNOWN_LANG, NO_LANG, ENGLISH, SPANISH
 from lidlists import (SPANISH_TOP32, SPANISH_32PLUS, ENGLISH_TOP32, ENGLISH_32PLUS)
-from scalereader import JERBOA_NOTAG
+from tools.scalereader import JERBOA_NOTAG
 from freqratio import wordlist_ratio, prune_ratios
-from codeswitchador import cs_langspresent
 
 # Seed for reproducibility
 seed(0)
@@ -70,6 +56,7 @@ PUNC = set(punctuation)
 BAD_TOKENS = set(['rt'])
 ALLOWED_TAG_PREFIXES = set(['ja', 'ha'])
 
+
 class TwoListLID(object):
     """
     Provides language identification using two wordlists per language.
@@ -82,7 +69,7 @@ class TwoListLID(object):
         @param lang_wordlists sequence of (lang_name, shortlist, longlist) tuples.
         """
         # Force wordlists to be sets
-        self.langs, self.shorts, self.longs = zip(*[(lang, set(shortlist), set(longlist)) 
+        self.langs, self.shorts, self.longs = zip(*[(lang, set(shortlist), set(longlist))
                                                     for lang, shortlist, longlist in lang_wordlists])
         # For speed, precompute number of langs
         self.nlangs = len(self.langs)
@@ -110,7 +97,7 @@ class TwoListLID(object):
                     long_scores[idx] += 1
 
         # Decide whether each language is there
-        langspresent = [(short_scores[idx] > 1 or 
+        langspresent = [(short_scores[idx] > 1 or
                          (short_scores[idx] == 1 and long_scores[idx] > 0))
                         for idx in range(self.nlangs)]
 
@@ -143,8 +130,9 @@ class DefaultTwoListLID(TwoListLID):
     LANGS = (SPANISH, ENGLISH)
 
     def __init__(self):
-        super(DefaultTwoListLID, self).__init__(((SPANISH, SPANISH_TOP32, SPANISH_32PLUS), 
-                                          (ENGLISH, ENGLISH_TOP32, ENGLISH_32PLUS)))
+        super(DefaultTwoListLID, self).__init__(((SPANISH, SPANISH_TOP32, SPANISH_32PLUS),
+                                                 (ENGLISH, ENGLISH_TOP32, ENGLISH_32PLUS)))
+
 
 class RatioListLID(object):
     """Provides LID using a list of frequency ratios for words in two languages."""
@@ -152,9 +140,9 @@ class RatioListLID(object):
     UNK_WORD_RATIO = 1.0
     _CONFIG_MODEL = 'model'
 
-    def __init__(self, ratiodict, lang1, lang2, low_ratio, high_ratio, lang1_min, lang2_min, 
+    def __init__(self, ratiodict, lang1, lang2, low_ratio, high_ratio, lang1_min, lang2_min,
                  lang1_max_unk_rate, lang2_max_unk_rate, cs_max_unk_rate):
-        """Set up for language ID using a ratiodict and 
+        """Set up for language ID using a ratiodict.
 
         @param ratiodict dict of word: ratio pairs
         @param lang1 name to give the language whose words have low ratios
@@ -170,8 +158,8 @@ class RatioListLID(object):
         self.cs_max_unk_rate = cs_max_unk_rate
 
     def _ratio_lang(self, ratio):
-        """
-        Return the language for a given ratio.
+        """Return the language for a given ratio.
+
         @param low_ratio ratio below which words need to be to count as lang1
         @param high_ratio ratio above which words need to be to count as lang2
         """
@@ -183,8 +171,8 @@ class RatioListLID(object):
             return UNKNOWN_LANG
 
     def idlangs(self, tokens):
-        """
-        Return whether a language is present and the counts from each wordlist.
+        """Return whether a language is present and the counts from each wordlist.
+
         @param tokens: tokens to identify
         """
         # Per-token ratios and langs
@@ -196,23 +184,23 @@ class RatioListLID(object):
         hits = [langs.count(lang) for lang in self.langs]
         known_lang_hits = hits[:-1]
         unknown_hits = hits[-1]
-        
+
         hitcount = sum(hits)
         unk_rate = unknown_hits / hitcount if hitcount else 1.0
-        langspresent = [(langhits >= present_min) 
+        langspresent = [(langhits >= present_min)
                         for langhits, present_min in zip(known_lang_hits, self.present_mins)]
 
         # Zero out langspresent based on unknown rate
         langspresent[0] = langspresent[0] and (unk_rate <= self.lang1_max_unk_rate)
         langspresent[1] = langspresent[1] and (unk_rate <= self.lang2_max_unk_rate)
-    
+
         # If we're under the acceptable unknown rate, we can have codeswitching
         cs = cs_langspresent(langspresent) if (unk_rate <= self.cs_max_unk_rate) else False
-        
+
         # Compute LID based on the greatest number of hits that passed thresholds
-        lid = self._pick_lang([hit if present else 0 
+        lid = self._pick_lang([hit if present else 0
                                for hit, present in zip(known_lang_hits, langspresent)])
-        
+
         return (lid, langspresent, hits, ratios, langs, unk_rate, cs)
 
     def _pick_lang(self, hits):
@@ -228,7 +216,7 @@ class RatioListLID(object):
 
     @classmethod
     def create_from_config(cls, path):
-        """Return a RatioListLID class initialized from a config file.""" 
+        """Return a RatioListLID class initialized from a config file."""
         # Parse configuration from the file
         config = RawConfigParser()
         result = config.read(path)
@@ -258,13 +246,13 @@ class RatioListLID(object):
         wordlist1 = codecs.open(wordlist1_path, 'Ur', 'utf_8')
         wordlist2 = codecs.open(wordlist2_path, 'Ur', 'utf_8')
         ratios, unused1, unused2 = wordlist_ratio(wordlist1, wordlist2, smoothing, min_freq)
-    
+
         # Remove words from the ignorelist
         if ignorelist:
             bad_words = set(line.strip() for line in codecs.open(ignorelist, 'Ur', 'utf_8'))
             prune_ratios(ratios, bad_words)
 
-        return cls(ratios, lang1, lang2, low_ratio, high_ratio, lang1_min, lang2_min, 
+        return cls(ratios, lang1, lang2, low_ratio, high_ratio, lang1_min, lang2_min,
                    lang1_max_unk_rate, lang2_max_unk_rate, cs_max_unk_rate)
 
     @classmethod
@@ -307,23 +295,23 @@ class AttachingRatioListLID(RatioListLID):
         hits = [langs.count(lang) for lang in self.langs]
         known_lang_hits = hits[:-1]
         unknown_hits = hits[-1]
-        
+
         hitcount = sum(hits)
         unk_rate = unknown_hits / hitcount if hitcount else 1.0
-        langspresent = [(langhits >= present_min) 
+        langspresent = [(langhits >= present_min)
                         for langhits, present_min in zip(known_lang_hits, self.present_mins)]
 
         # Zero out langspresent based on unknown rate
         langspresent[0] = langspresent[0] and (unk_rate <= self.lang1_max_unk_rate)
         langspresent[1] = langspresent[1] and (unk_rate <= self.lang2_max_unk_rate)
-    
+
         # If we're under the acceptable unknown rate, we can have codeswitching
         cs = cs_langspresent(langspresent) if (unk_rate <= self.cs_max_unk_rate) else False
-        
+
         # Compute LID based on the greatest number of hits that passed thresholds
-        lid = self._pick_lang([hit if present else 0 
+        lid = self._pick_lang([hit if present else 0
                                for hit, present in zip(known_lang_hits, langspresent)])
-        
+
         return (lid, langspresent, hits, ratios, langs, unk_rate, cs)
 
 
@@ -344,7 +332,7 @@ def default_lidder(model_name, model_config=None):
 ALL_DIGIT_MATCHER = re.compile('^[\.0-9]+$')
 def non_lid(token, tag=JERBOA_NOTAG):
     """Return whether a token's LID should be ignored."""
-    return (all([char in PUNC for char in token]) or 
+    return (all([char in PUNC for char in token]) or
             ALL_DIGIT_MATCHER.match(token) or
             (tag != JERBOA_NOTAG and tag[:2] not in ALLOWED_TAG_PREFIXES) or
             token in BAD_TOKENS)
@@ -397,7 +385,7 @@ def choose_unk_lang(langs, unkmethod):
             break
 
         # Make an ordered list of which tokens it would be a good idea to
-        # take a lang from. Get everything from the left first going backwards, 
+        # take a lang from. Get everything from the left first going backwards,
         # and then everything from the right. If the index is zero, just go right.
         next_langs = (langs[unk_idx - 1::-1] + langs[unk_idx + 1:]) if unk_idx else langs[unk_idx + 1:]
 
@@ -415,3 +403,10 @@ def choose_unk_lang(langs, unkmethod):
 
     # Reverse again if needed
     return langs[::-1] if unkmethod == UNK_METHOD_RIGHT else langs
+
+def cs_langspresent(presentlangs):
+    """
+    Return information about code-switching given a vector of whether languages are present.
+    """
+    # If there's more than one language, say yes
+    return numpy.count_nonzero(presentlangs) > 1

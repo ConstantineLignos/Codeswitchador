@@ -97,7 +97,7 @@ class Accuracy(object):
     def confusion_matrix(self):
         """Return a string representation of a confusion matrix."""
         classes = sorted(self.classes)
-        rows = (["\t-Predicted labels-", "-Gold-\t" + "\t".join(classes)] + 
+        rows = (["\t-Predicted labels-", "-Gold-\t" + "\t".join(classes)] +
                 ["\t".join([rowname] + [str(len(self.confusion[rowname][colname])) for colname in classes])
                  for rowname in classes])
         return "\n".join(rows)
@@ -158,7 +158,7 @@ class SDMetrics(object):
     def recall(self):
         """Recall"""
         try:
-            return self.tp / (self.tp + self.fn) 
+            return self.tp / (self.tp + self.fn)
         except ZeroDivisionError:
             return float('nan')
 
@@ -184,12 +184,12 @@ class SDMetrics(object):
         Matthews Correlation Coefficient
 
         Provides a more robust measure than F-score when classes are unbalanced. See:
-        Matthews, B.W., Comparison of the predicted and observed secondary structure of T4 phage 
+        Matthews, B.W., Comparison of the predicted and observed secondary structure of T4 phage
         lysozyme. Biochim. Biophys. Acta 1975, 405, 442-451
         """
         try:
-            return (((self.tp * self.tn) - (self.fp * self.fn)) / 
-                    sqrt((self.tp + self.fp) * (self.tp + self.fn) * 
+            return (((self.tp * self.tn) - (self.fp * self.fn)) /
+                    sqrt((self.tp + self.fp) * (self.tp + self.fn) *
                          (self.tn + self.fp) * (self.tn + self.fn)))
         except ZeroDivisionError:
             return float('nan')
@@ -201,7 +201,7 @@ class SDMetrics(object):
 
     def __str__(self):
         return "\n".join([
-                "Gold standard of {0} items, {1:2.1f}% positive".format(len(self), 
+                "Gold standard of {0} items, {1:2.1f}% positive".format(len(self),
                                                                   100 * (self.tp + self.fn) / len(self)),
                 "Precision: {0:.3f} ({1} items)".format(self.precision, self.tp + self.fp),
                 "Recall: {0:.3f} ({1} items)".format(self.recall, self.tp + self.fn),
@@ -212,12 +212,12 @@ class SDMetrics(object):
 
     def __repr__(self):
         return "<SDMetrics with %s observations>" % len(self)
-    
+
     def __len__(self):
         return self.tp + self.fp + self.tn + self.fn
 
     def confusion_matrix(self):
         """Return a string representation of a confusion matrix."""
-        return "\n".join([ "\t-Predicted labels-", "-Gold-\tTrue\tFalse", 
-                           "True\t{0}\t{1}".format(self.tp, self.fn), 
+        return "\n".join([ "\t-Predicted labels-", "-Gold-\tTrue\tFalse",
+                           "True\t{0}\t{1}".format(self.tp, self.fn),
                  "False\t{0}\t{1}".format(self.fp, self.tn)])

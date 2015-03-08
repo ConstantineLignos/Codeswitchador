@@ -1,9 +1,7 @@
-#!/usr/bin/env python
 """
-Remove edit explanations from the adjudicated corpus
+Some constants for LID that other files may refer to.
 
-Constantine Lignos
-February 2013
+Constantine Lignos, July 2012
 
 """
 
@@ -21,13 +19,15 @@ February 2013
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import re
-import codecs
+# Language constants
+ENGLISH = "eng"
+SPANISH = "spa"
+UNKNOWN_LANG = "und"
+MULTIPLE_LANGS = "mul"
+NO_LINGUISTIC_CONTENT = "zxx"
+NO_LANG = "n"
 
-
-EDIT_RE = re.compile(r"\|\|Edits.+$")
-
-output = codecs.getwriter('utf_8')(sys.stdout)
-for line in codecs.getreader('utf_8')(sys.stdin):
-    print >> output, EDIT_RE.sub('', line.rstrip())
+# Entities
+ENTITY_NAME = "p"
+ENTITY_TITLE = "t"
+ENTITY_TAGS = (ENTITY_NAME, ENTITY_TITLE)

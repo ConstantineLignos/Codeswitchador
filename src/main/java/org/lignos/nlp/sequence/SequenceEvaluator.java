@@ -164,6 +164,7 @@ public class SequenceEvaluator {
     public void printResults() {
         System.out.println("Accuracy: " + accuracy + " (" + hits + "/" + total + ")");
         System.out.println("OOV accuracy: " + oovAccuracy + " (" + oovHits + "/" + oov + ")");
+        System.out.println("OOV rate: " + oovRate + " (" + oov + "/" + total + ")");
         System.out.println("Class accuracies:");
         for (String label : labelAccuracy.keySet()) {
             System.out.println(label + ": " + labelAccuracy.get(label));

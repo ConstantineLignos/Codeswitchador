@@ -16,6 +16,8 @@ package org.lignos.nlp.sequence;
  * limitations under the License.
  */
 
+import org.lignos.nlp.codeswitching.Constants;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,7 +45,7 @@ public class FeatureSequenceCorpusReader implements Iterable<FeatureSequence> {
     public static FeatureSequenceCorpusReader getCorpusFeatures(String path, SequenceFeatureSet featureSet) {
         SequenceCorpusReader reader = null;
         try {
-            reader = new SequenceCorpusReader(path, false);
+            reader = new SequenceCorpusReader(path, Constants.IGNORE_TAGS);
         } catch (IOException err) {
             System.err.println("Could not open input file: " + path);
             System.exit(1);

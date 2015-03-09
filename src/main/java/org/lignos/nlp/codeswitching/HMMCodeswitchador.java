@@ -20,66 +20,70 @@ import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import gnu.trove.map.hash.THashMap;
 import org.lignos.nlp.codeswitching.hmm.*;
 import org.lignos.nlp.sequence.Sequence;
-import org.lignos.nlp.sequence.TokenState;
+import org.lignos.nlp.sequence.SequenceCorpusReader;
+import org.lignos.nlp.sequence.TokenTag;
 
 import java.io.IOException;
 import java.util.*;
 
 public class HMMCodeswitchador {
-    // TODO: Make the names of states not constants and generalize constructor
-	private static final String[] STATES = {"e", "s"};
-	private static final String[] NONSTATES = {"n", "o"};
 
 	/**
 	 * Make an HMM for code switching.
-	 * @param englishWordlistPath Path to the English wordlist.
-	 * @param spanishWordlistPath Path to the Spanish wordlist.
+     * @param lang1 Tag for language 1
+     * @param wordlist1Path Path to the wordlist for language 1
+     * @param lang2 Tag for language 2
+     * @param wordlist2Path Path to the wordlist for language 2
      * @param trainPath Training data path
      * @param testPath Test data path
-	 * @throws IOException When one of the wordlists or corpora can't be read.
+	 * @throws IOException if one of the wordlists or corpora cannot be read.
 	 */
-	public static float[] evalHMM(String englishWordlistPath, String spanishWordlistPath,
+	public static float[] evalHMM(String lang1, String wordlist1Path,
+                                  String lang2, String wordlist2Path,
                                   String trainPath, String testPath) {
+        // Set up language tags as states
+        String[] states = {lang1, lang2};
+
 		// Load up training data
         System.out.println("Loading training data...");
         TrainingCorpus train = null;
         try {
-            train = new TrainingCorpus(trainPath, false);
+            train = new TrainingCorpus(trainPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open input file: " + trainPath);
             System.exit(1);
         }
 
         // Load wordlist probabilities
-        TokenCounts englishCounts = null;
+        TokenCounts lang1Counts = null;
         try {
-            englishCounts = new TokenCounts(englishWordlistPath);
+            lang1Counts = new TokenCounts(wordlist1Path);
         } catch (IOException e) {
-            System.err.println("Could not open input file: " + englishWordlistPath);
+            System.err.println("Could not open input file: " + wordlist1Path);
             System.exit(1);
         }
-        TokenCounts spanishCounts = null;
+        TokenCounts lang2Counts = null;
         try {
-            spanishCounts = new TokenCounts(spanishWordlistPath);
+            lang2Counts = new TokenCounts(wordlist2Path);
         } catch (IOException e) {
-            System.err.println("Could not open input file: " + spanishWordlistPath);
+            System.err.println("Could not open input file: " + wordlist2Path);
             System.exit(1);
         }
         // Map states to their emissions pdfs
         Map<String, TokenCounts> emissionsMap = new THashMap<String, TokenCounts>();
-        // The order of these must match the order in STATES
-        emissionsMap.put(STATES[0], englishCounts);
-        emissionsMap.put(STATES[1], spanishCounts);
+        // The order of these must match the order in states
+        emissionsMap.put(lang1, lang1Counts);
+        emissionsMap.put(lang2, lang2Counts);
 
         // Estimate state probabilities and also update emissions based on the training data
         System.out.println("Estimating parameters...");
-        StateProbabilities stateProbs = train.computeStateProbabilities(STATES, NONSTATES, emissionsMap);
+        StateProbabilities stateProbs = train.computeStateProbabilities(states, Constants.IGNORE_TAGS, emissionsMap);
 
         // Create PDFs from the TokenCounts
         List<WordlistObs> pdfs = new ArrayList<WordlistObs>();
         Map<String, TokenObservation> observations = new THashMap<String, TokenObservation>();
-        WordlistObs english = new WordlistObs(englishCounts, observations);
-        WordlistObs spanish = new WordlistObs(spanishCounts, observations);
+        WordlistObs english = new WordlistObs(lang1Counts, observations);
+        WordlistObs spanish = new WordlistObs(lang2Counts, observations);
         // The order of these must match the order in STATES
         pdfs.add(english);
         pdfs.add(spanish);
@@ -94,13 +98,13 @@ public class HMMCodeswitchador {
 		System.out.println(h);
 
         // Make a set of nonStates for fast checking
-        Set<String> nonStates = new HashSet<String>(Arrays.asList(NONSTATES));
+        Set<String> nonStates = new HashSet<String>(Arrays.asList(Constants.IGNORE_TAGS));
 
         // Label the test corpus
         System.out.println("Evaluating...");
-        Corpus test = null;
+        SequenceCorpusReader test = null;
         try {
-            test = new Corpus(testPath, false);
+            test = new SequenceCorpusReader(testPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open input file: " + testPath);
             System.exit(1);
@@ -113,7 +117,7 @@ public class HMMCodeswitchador {
 		for (Sequence utt : test) {
 			// Get observations for every word
 			List<TokenObservation> uttObs = new LinkedList<TokenObservation>();
-			for (TokenState ts : utt) {
+			for (TokenTag ts : utt) {
                 // Since the observation map is shared between labels, it doesn't matter where we get the observation
                 uttObs.add(english.getObs(ts.token));
 			}
@@ -122,16 +126,16 @@ public class HMMCodeswitchador {
 			int[] predStates = h.mostLikelyStateSequence(uttObs);
 			String[] stateNames = new String[predStates.length];
 			for (int i = 0; i < predStates.length; i++) {
-                TokenState goldToken = utt.get(i);
+                TokenTag goldToken = utt.get(i);
 
 				// Use the non states if they were in the input
-                if (nonStates.contains(goldToken.state)) {
-                    stateNames[i] = goldToken.state;
+                if (nonStates.contains(goldToken.tag)) {
+                    stateNames[i] = goldToken.tag;
 				}
 				// Otherwise, compare the states
 				else {
-					String predState = STATES[predStates[i]];
-                    String goldState = goldToken.state;
+					String predState = states[predStates[i]];
+                    String goldState = goldToken.tag;
                     // Skip evaluation if the original token has a comment marked
                     if (goldToken.comment == null) {
                         // Normal scoring
@@ -166,11 +170,11 @@ public class HMMCodeswitchador {
 	}
 
     public static void main(String[] args) {
-        if (args.length != 4) {
-            System.err.println("Usage: HMMCodeswitchador englishwordlist spanishwordlist trainpath testpath");
+        if (args.length != 6) {
+            System.err.println("Usage: HMMCodeswitchador lang1 wordlist1 lang2 wordlist2 trainpath testpath");
             System.exit(1);
         }
-        evalHMM(args[0], args[1], args[2], args[3]);
+        evalHMM(args[0], args[1], args[2], args[3], args[4], args[5]);
     }
 }
 

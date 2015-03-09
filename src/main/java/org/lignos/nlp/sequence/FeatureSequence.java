@@ -84,7 +84,7 @@ public class FeatureSequence {
         // Accumulate labels
         String[] labels = new String[seq.size()];
         for (int i = 0; i < seq.size(); i++) {
-            labels[i] = seq.get(i).state;
+            labels[i] = seq.get(i).tag;
         }
         List<List<String>> seqFeaturesList = featureSet.generateAllSequenceFeatures(seq, labels);
         return new FeatureSequence(seqFeaturesList, labels);

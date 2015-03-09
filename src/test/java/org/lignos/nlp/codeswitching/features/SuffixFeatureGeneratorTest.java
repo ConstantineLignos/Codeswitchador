@@ -48,7 +48,7 @@ public class SuffixFeatureGeneratorTest {
      */
     @Test
     public void testGenerateMinStem() throws Exception {
-        Sequence seq = new Sequence("a/a aa/a aaa/a", false);
+        Sequence seq = new Sequence("a/a aa/a aaa/a", null);
         SuffixFeatureGenerator gen = new SuffixFeatureGenerator(1, 4, 3);
 
         // Too short for any features
@@ -69,7 +69,7 @@ public class SuffixFeatureGeneratorTest {
      */
     @Test
     public void testGenerateSuffixRange() throws Exception {
-        Sequence seq = new Sequence("aaab/a aaabc/a aaabcd/a aaabcde/a", false);
+        Sequence seq = new Sequence("aaab/a aaabc/a aaabcd/a aaabcde/a", null);
         SuffixFeatureGenerator gen = new SuffixFeatureGenerator(1, 4, 3);
 
         features = gen.genTokenFeatures(seq, 0);

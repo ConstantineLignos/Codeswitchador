@@ -33,14 +33,16 @@ import java.util.concurrent.TimeUnit;
 public class HMMCodeswitchadorEval {
 
     private static final String USAGE = "Usage: HMM CodeswitchadorEval " +
-            "trainfilelist testfile outputdir englishwordlist spanishwordlist";
+            "trainfilelist testfile outputdir lang1 wordlist1 lang2 wordlist2";
 
     private final String[] trainPaths;
     private final String[] trainNames;
     private final String testPath;
     private final String outDirPath;
-    private final String englishWordlistPath;
-    private final String spanishWordlistPath;
+    private final String lang1;
+    private final String wordlist1Path;
+    private final String lang2;
+    private final String wordlist2Path;
 
     /**
      * Set up an evaluation experiment
@@ -48,17 +50,20 @@ public class HMMCodeswitchadorEval {
      * @param testPath path of testing file
      * @param outDirPath output directory
      * @param trainNames name of training conditions
-     * @param englishWordlistPath path of English word list
-     * @param spanishWordlistPath path of Spanish word list
+     * @param wordlist1Path path of English word list
+     * @param wordlist2Path path of Spanish word list
      */
     public HMMCodeswitchadorEval(String[] trainPaths, String testPath, String outDirPath,
-                                 String[] trainNames, String englishWordlistPath, String spanishWordlistPath) {
+                                 String[] trainNames, String lang1, String wordlist1Path,
+                                 String lang2, String wordlist2Path) {
         this.trainPaths = trainPaths;
         this.trainNames = trainNames;
         this.testPath = testPath;
         this.outDirPath = outDirPath;
-        this.englishWordlistPath = englishWordlistPath;
-        this.spanishWordlistPath = spanishWordlistPath;
+        this.lang1 = lang1;
+        this.wordlist1Path = wordlist1Path;
+        this.lang2 = lang2;
+        this.wordlist2Path = wordlist2Path;
     }
 
     /**
@@ -93,7 +98,7 @@ public class HMMCodeswitchadorEval {
         for (int i = 0; i < trainPaths.length; i++) {
             String trainPath = trainPaths[i];
             String trainName = trainNames[i];
-            float[] result = HMMCodeswitchador.evalHMM(englishWordlistPath, spanishWordlistPath,
+            float[] result = HMMCodeswitchador.evalHMM(lang1, wordlist1Path, lang2, wordlist2Path,
                     trainPath, testPath);
             csv.println(features + "," + trainName + "," + result[0] + "," + result[2] + "," + result[1]);
         }
@@ -105,7 +110,7 @@ public class HMMCodeswitchadorEval {
     }
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 5) {
+        if (args.length != 7) {
             System.err.println(USAGE);
             System.exit(1);
         }
@@ -114,9 +119,10 @@ public class HMMCodeswitchadorEval {
         String trainFileList = args[0];
         String testPath = args[1];
         String outDirPath = args[2];
-        String englishWordlistPath = args[3];
-        String spanishWordlistPath = args[4];
-
+        String lang1 = args[3];
+        String lang1WordlistPath = args[4];
+        String lang2 = args[5];
+        String lang2WordlistPath = args[6];
 
         // Read in training paths
         List<String> trainFileLines = StringUtil.fileLinesAsStringList(trainFileList);
@@ -138,7 +144,7 @@ public class HMMCodeswitchadorEval {
 
         // Evaluate
         HMMCodeswitchadorEval eval = new HMMCodeswitchadorEval(trainPaths, testPath,
-                outDirPath, trainNames, englishWordlistPath, spanishWordlistPath);
+                outDirPath, trainNames, lang1, lang1WordlistPath, lang2, lang2WordlistPath);
         eval.run();
     }
 }

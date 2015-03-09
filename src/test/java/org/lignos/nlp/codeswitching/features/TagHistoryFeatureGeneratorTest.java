@@ -47,7 +47,7 @@ public class TagHistoryFeatureGeneratorTest {
      */
     @Test
     public void testGenerateMiddle() throws Exception {
-        Sequence seq = new Sequence("a/a b/b c/c", false);
+        Sequence seq = new Sequence("a/a b/b c/c", null);
         String[] labels = seq.getLabels();
 
         TagHistoryFeatureGenerator gen1 = new TagHistoryFeatureGenerator(1);
@@ -69,7 +69,7 @@ public class TagHistoryFeatureGeneratorTest {
      */
     @Test
     public void testGenerateStart() throws Exception {
-        Sequence seq = new Sequence("a/a b/b c/c", false);
+        Sequence seq = new Sequence("a/a b/b c/c", null);
         String[] labels = seq.getLabels();
 
         TagHistoryFeatureGenerator gen1 = new TagHistoryFeatureGenerator(1);

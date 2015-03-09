@@ -60,14 +60,14 @@ public class PerceptronCodeswitchador {
         CodeswitchFeatureSet featureSet = CodeswitchFeatureSet.createFeatureSet(featureNames);
         SequenceCorpusReader trainReader = null;
         try {
-            trainReader = new SequenceCorpusReader(trainPath, false);
+            trainReader = new SequenceCorpusReader(trainPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open training file: " + trainPath);
             System.exit(1);
         }
         SequenceCorpusReader testReader = null;
         try {
-            testReader = new SequenceCorpusReader(testPath, false);
+            testReader = new SequenceCorpusReader(testPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open training file: " + testPath);
             System.exit(1);

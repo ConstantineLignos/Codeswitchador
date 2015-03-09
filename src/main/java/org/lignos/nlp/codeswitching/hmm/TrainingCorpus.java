@@ -1,17 +1,28 @@
 package org.lignos.nlp.codeswitching.hmm;
 
-import gnu.trove.map.hash.THashMap;
+import org.lignos.nlp.codeswitching.Constants;
 import org.lignos.nlp.sequence.Sequence;
-import org.lignos.nlp.sequence.TokenState;
+import org.lignos.nlp.sequence.SequenceCorpusReader;
+import org.lignos.nlp.sequence.TokenTag;
 
 import java.io.IOException;
 import java.util.*;
 
-public class TrainingCorpus extends Corpus {
+public class TrainingCorpus extends SequenceCorpusReader {
 
-	public TrainingCorpus(String path, boolean keepPunc) throws IOException {
-		super(path, keepPunc);
+	public TrainingCorpus(String path, String[] ignoreTags) throws IOException {
+		super(path, Constants.IGNORE_TAGS);
 	}
+
+    /**
+     * Create a hash key that can uniquely identify a state transition
+     * @param state1 first state
+     * @param state2 second state
+     * @return key representing the transition
+     */
+    protected static String transKey(String state1, String state2) {
+        return state1 + ":" + state2;
+    }
 
     /**
      * Compute transition probability based on the training data, optionally also updating emssions.
@@ -48,29 +59,29 @@ public class TrainingCorpus extends Corpus {
 			// Track our index in the utterance so we can get inits right
 			boolean first = true;
 			String lastState = null;
-			for (TokenState tokenState : utt)  {
+			for (TokenTag tokenTag : utt)  {
 				// Skip non-states
-                if (nonStateSet.contains(tokenState.state)) {
+                if (nonStateSet.contains(tokenTag.tag)) {
 					continue;
 				}
 				// Init if first, transition otherwise
 				if (first) {
-                    initCounts.put(tokenState.state, initCounts.get(tokenState.state) + 1);
+                    initCounts.put(tokenTag.tag, initCounts.get(tokenTag.tag) + 1);
 					initTotal += 1;
 					first = false;
 				}
 				else {
-                    String trans = transKey(lastState, tokenState.state);
+                    String trans = transKey(lastState, tokenTag.tag);
 					int count = transCounts.get(trans);
 					transCounts.put(trans, count + 1);
 					fromCounts.put(lastState, fromCounts.get(lastState) + 1);
 				}
-                lastState = tokenState.state;
+                lastState = tokenTag.tag;
 
                 // Increment emissions
                 if (emissions != null) {
-                    TokenCounts stateEmissions = emissions.get(tokenState.state);
-                    stateEmissions.incrementCount(tokenState.token, 1);
+                    TokenCounts stateEmissions = emissions.get(tokenTag.tag);
+                    stateEmissions.incrementCount(tokenTag.token, 1);
                 }
 			}
 		}

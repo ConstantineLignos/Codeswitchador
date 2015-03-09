@@ -16,19 +16,26 @@ package org.lignos.nlp.sequence;
  * limitations under the License.
  */
 
-public class TokenState {
+/**
+ * Represents a (token, tag) pair.
+ */
+public class TokenTag {
 
+    /** The text of the token */
     public final String token;
-    public final String state;
+    /** The tag of the token */
+    public final String tag;
+    /** Any comments for the token, often used for dash tags */
     public final String comment;
 
-    public TokenState(String token, String state, String comment) {
+    /** Initialize a TokenTag with the specified token, tag, and comment. */
+    public TokenTag(String token, String tag, String comment) {
         this.token = token;
-        this.state = state;
+        this.tag = tag;
         this.comment = comment;
     }
 
     public String toString() {
-		return this.token + "/" + this.state;
+		return this.token + "/" + this.tag + (this.comment != null ? "-" + this.comment : "");
 	}
 }

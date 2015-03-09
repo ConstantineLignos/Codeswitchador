@@ -45,7 +45,7 @@ public class TagContextFeatureGeneratorTest {
     */
     @Test
     public void testGenerateMiddle() throws Exception {
-        Sequence seq = new Sequence("a/a b/b c/c", false);
+        Sequence seq = new Sequence("a/a b/b c/c", null);
         String[] labels = seq.getLabels();
 
         TagContextFeatureGenerator gen1 = new TagContextFeatureGenerator(-1);
@@ -67,7 +67,7 @@ public class TagContextFeatureGeneratorTest {
      */
     @Test
     public void testGenerateStart() throws Exception {
-        Sequence seq = new Sequence("a/a b/b c/c", false);
+        Sequence seq = new Sequence("a/a b/b c/c", null);
         String[] labels = seq.getLabels();
 
         TagContextFeatureGenerator gen1 = new TagContextFeatureGenerator(-1);

@@ -17,6 +17,7 @@ package org.lignos.nlp.sequence;
  */
 
 import gnu.trove.map.hash.THashMap;
+import org.lignos.nlp.codeswitching.Constants;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -77,14 +78,14 @@ public class SequenceEvaluator {
     public static SequenceEvaluator getFromPaths(String goldPath, String predPath, String trainPath) {
         SequenceCorpusReader goldReader = null;
         try {
-            goldReader = new SequenceCorpusReader(goldPath, false);
+            goldReader = new SequenceCorpusReader(goldPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open input file: " + goldPath);
             System.exit(1);
         }
         SequenceCorpusReader predReader = null;
         try {
-            predReader = new SequenceCorpusReader(predPath, false);
+            predReader = new SequenceCorpusReader(predPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open input file: " + predPath);
             System.exit(1);
@@ -92,7 +93,7 @@ public class SequenceEvaluator {
         SequenceCorpusReader trainReader = null;
         if (trainPath != null) {
             try {
-                trainReader = new SequenceCorpusReader(trainPath, false);
+                trainReader = new SequenceCorpusReader(trainPath, Constants.IGNORE_TAGS);
             } catch (IOException e) {
                 System.err.println("Could not open input file: " + trainPath);
                 System.exit(1);
@@ -110,7 +111,7 @@ public class SequenceEvaluator {
         // Do a first pass to build the vocabulary. We lowercase on the way in
         if (trainReader != null) {
             for (Sequence seq : trainReader) {
-                for (TokenState token : seq) {
+                for (TokenTag token : seq) {
                     String tokenLower = token.token.toLowerCase();
                     trainCounts.put(tokenLower, trainCounts.getOrDefault(tokenLower, 0) + 1);
                 }
@@ -135,27 +136,27 @@ public class SequenceEvaluator {
 
             // Compare each token/tag
             for (int i = 0; i < goldSeq.size(); i++) {
-                TokenState gold = goldSeq.get(i);
-                TokenState pred = predSeq.get(i);
+                TokenTag gold = goldSeq.get(i);
+                TokenTag pred = predSeq.get(i);
                 // Skip token if needed
                 if (ignoreComment && gold.comment != null) {
                     continue;
                 }
 
                 // Overall accuracy
-                if (gold.state.equals(pred.state)) {
+                if (gold.tag.equals(pred.tag)) {
                     hits++;
-                    labelHits.put(gold.state, labelHits.getOrDefault(gold.state, 0) + 1);
+                    labelHits.put(gold.tag, labelHits.getOrDefault(gold.tag, 0) + 1);
                 } else {
                     misses++;
-                    labelMisses.put(gold.state, labelMisses.getOrDefault(gold.state, 0) + 1);
+                    labelMisses.put(gold.tag, labelMisses.getOrDefault(gold.tag, 0) + 1);
                 }
 
                 // Count OOV
                 if (!trainCounts.containsKey(gold.token)) {
                     oov++;
                     // OOV accuracy
-                    if (gold.state.equals(pred.state)) {
+                    if (gold.tag.equals(pred.tag)) {
                         oovHits++;
                     } else {
                         oovMisses++;

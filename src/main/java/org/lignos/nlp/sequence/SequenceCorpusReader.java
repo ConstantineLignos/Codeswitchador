@@ -55,8 +55,8 @@ public class SequenceCorpusReader implements Iterable<Sequence> {
                 sequences.add(new Sequence(line, ignoreTagsSet));
             }
             catch (MalformedSequenceException e) {
-                System.err.println("Bad utterance at line " + lineNum);
-                System.err.println("Line: " + line);
+                System.err.println("Bad utterance at line " + lineNum + " of file "  + path);
+                System.err.println("Line contents: '" + line + "'");
                 System.err.println("Reason: " + e.getMessage());
             }
         }

@@ -65,6 +65,10 @@ public class Sequence implements Iterable<TokenTag> {
                 tokens.add(new TokenTag(token, tag, comment));
             }
         }
+        // If no tokens were added, raise an exception
+        if (tokens.isEmpty()) {
+            throw new MalformedSequenceException("No valid tokens found in text");
+        }
 	}
 
 	public int size() {

@@ -22,10 +22,8 @@ import org.lignos.nlp.sequence.SequenceCorpusReader;
 import org.lignos.nlp.sequence.SequenceEvaluator;
 import org.lignos.nlp.util.StringUtil;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -123,9 +121,13 @@ public class PerceptronCodeswitchador {
             if (parent != null) {
                 parent.mkdirs();
             }
-            output = new PrintWriter(file);
+            output = new PrintWriter(file, StandardCharsets.UTF_8.name());
         } catch (FileNotFoundException e) {
             System.err.println("Could not open output file: " + outPath);
+            System.exit(1);
+        } catch (UnsupportedEncodingException e) {
+            // If this is triggered, something is wrong with the Java universe.
+            e.printStackTrace();
             System.exit(1);
         }
         float accuracy = perc.test(testReader, output);

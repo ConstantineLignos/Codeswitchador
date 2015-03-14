@@ -34,5 +34,5 @@ TODO: More things here!
 
 License
 =======
-Codeswitchador is distributed under the Simplified BSD License. See
-LICENSE for more information.
+Codeswitchador is distributed under the Apache License version 2.0. See
+LICENSE.txt for more information.

@@ -23,7 +23,6 @@ import os
 import sys
 import unittest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from wordlistlid import *
 
 # Tests values for ratio list lid
@@ -223,7 +222,7 @@ class TestRatioListLID(unittest.TestCase):
     def test_ignore_words(self):
         """Test that specified words are ignored."""
         # Make sure these are banned
-        lidder = RatioListLID.create_from_config('tests/testparams.cfg')
+        lidder = RatioListLID.create_from_config('testdata/testparams.cfg')
         lid, langspresent, hits, ratios, langs, unk_rate, cs = lidder.idlangs(BANNED_WORDS)
         self.assertEqual(langs, [UNKNOWN_LANG for _ in BANNED_WORDS])
         # Make sure other things aren't

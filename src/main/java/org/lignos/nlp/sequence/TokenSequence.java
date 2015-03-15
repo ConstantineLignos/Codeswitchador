@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  * Represent a sequence of tagged tokens.
  */
-public class Sequence implements Iterable<TokenTag> {
+public class TokenSequence implements Iterable<TokenTag> {
 	protected static final String NON_TAG = "unk";
 	protected static final Pattern statePattern = Pattern.compile("^(.+)/(\\w+)(?:-(\\w+))?$");
 	protected final List<TokenTag> tokens;
@@ -38,7 +38,7 @@ public class Sequence implements Iterable<TokenTag> {
      * @param ignoreTags tags marking tokens that should be ignored
      * @throws MalformedSequenceException if the sequence cannot be parsed
      */
-	public Sequence(String text, Set<String> ignoreTags) throws MalformedSequenceException {
+	public TokenSequence(String text, Set<String> ignoreTags) throws MalformedSequenceException {
 		tokens = new ArrayList<TokenTag>();
 		loadTokens(text, ignoreTags);
         labels = new String[tokens.size()];

@@ -20,9 +20,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
-import org.lignos.nlp.sequence.Sequence;
+import org.lignos.nlp.sequence.TokenSequence;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -45,7 +44,7 @@ public class TagContextFeatureGeneratorTest {
     */
     @Test
     public void testGenerateMiddle() throws Exception {
-        Sequence seq = new Sequence("a/a b/b c/c", null);
+        TokenSequence seq = new TokenSequence("a/a b/b c/c", null);
         String[] labels = seq.getLabels();
 
         TagContextFeatureGenerator gen1 = new TagContextFeatureGenerator(-1);
@@ -67,7 +66,7 @@ public class TagContextFeatureGeneratorTest {
      */
     @Test
     public void testGenerateStart() throws Exception {
-        Sequence seq = new Sequence("a/a b/b c/c", null);
+        TokenSequence seq = new TokenSequence("a/a b/b c/c", null);
         String[] labels = seq.getLabels();
 
         TagContextFeatureGenerator gen1 = new TagContextFeatureGenerator(-1);

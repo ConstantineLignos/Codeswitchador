@@ -18,7 +18,7 @@ package org.lignos.nlp.codeswitching;
 
 import org.lignos.nlp.codeswitching.features.CodeswitchFeatureSet;
 import org.lignos.nlp.ml.Perceptron;
-import org.lignos.nlp.sequence.SequenceCorpusReader;
+import org.lignos.nlp.sequence.TokenSequenceCorpusReader;
 import org.lignos.nlp.sequence.SequenceEvaluator;
 import org.lignos.nlp.util.StringUtil;
 
@@ -39,12 +39,12 @@ public class PerceptronCodeswitchador {
     private static final boolean AVERAGED = true;
     private static final boolean GREEDY_DECODE = false;
 
-    private final SequenceCorpusReader trainReader;
-    private final SequenceCorpusReader testReader;
+    private final TokenSequenceCorpusReader trainReader;
+    private final TokenSequenceCorpusReader testReader;
     private final CodeswitchFeatureSet featureSet;
 
-    public PerceptronCodeswitchador(SequenceCorpusReader trainReader,
-                                    SequenceCorpusReader testReader,
+    public PerceptronCodeswitchador(TokenSequenceCorpusReader trainReader,
+                                    TokenSequenceCorpusReader testReader,
                                     CodeswitchFeatureSet featureSet) {
         this.trainReader = trainReader;
         this.testReader = testReader;
@@ -56,16 +56,16 @@ public class PerceptronCodeswitchador {
         // Create feature sets and load data
         List<String> featureNames = StringUtil.fileLinesAsStringList(featurePath);
         CodeswitchFeatureSet featureSet = CodeswitchFeatureSet.createFeatureSet(featureNames);
-        SequenceCorpusReader trainReader = null;
+        TokenSequenceCorpusReader trainReader = null;
         try {
-            trainReader = new SequenceCorpusReader(trainPath, Constants.IGNORE_TAGS);
+            trainReader = new TokenSequenceCorpusReader(trainPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open training file: " + trainPath);
             System.exit(1);
         }
-        SequenceCorpusReader testReader = null;
+        TokenSequenceCorpusReader testReader = null;
         try {
-            testReader = new SequenceCorpusReader(testPath, Constants.IGNORE_TAGS);
+            testReader = new TokenSequenceCorpusReader(testPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open training file: " + testPath);
             System.exit(1);

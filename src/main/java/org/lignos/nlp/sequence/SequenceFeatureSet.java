@@ -47,7 +47,7 @@ public class SequenceFeatureSet {
      * @param index the index in the sequence to use for feature extraction
      * @return the generated features
      */
-    public List<String> generateTokenFeatures(Sequence seq, int index) {
+    public List<String> generateTokenFeatures(TokenSequence seq, int index) {
         List<String> features = new LinkedList<String>();
         for (TokenSequenceFeatureGenerator generator : tokenGenerators) {
             features.addAll(generator.genTokenFeatures(seq, index));
@@ -78,7 +78,7 @@ public class SequenceFeatureSet {
      * @param index the index in the sequence to use for feature extraction
      * @return the generated features
      */
-    public List<String> generateAllFeatures(Sequence seq, String[] labels, int index) {
+    public List<String> generateAllFeatures(TokenSequence seq, String[] labels, int index) {
         List<String> features = new LinkedList<String>();
         for (TokenSequenceFeatureGenerator generator : tokenGenerators) {
             features.addAll(generator.genTokenFeatures(seq, index));
@@ -95,7 +95,7 @@ public class SequenceFeatureSet {
      * @param labels the labels, which must all be non-null
      * @return the generated features
      */
-    public List<List<String>> generateAllSequenceFeatures(Sequence seq, String[] labels) {
+    public List<List<String>> generateAllSequenceFeatures(TokenSequence seq, String[] labels) {
         List<List<String>> output = new LinkedList<List<String>>();
         for (int i = 0; i < seq.size(); i++) {
             output.add(generateAllFeatures(seq, labels, i));

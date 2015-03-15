@@ -25,19 +25,19 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /**
- * Provide a reader for a corpus of sequences.
+ * Provide a reader for a corpus of token sequences.
  */
-public class SequenceCorpusReader implements Iterable<Sequence> {
+public class TokenSequenceCorpusReader implements Iterable<TokenSequence> {
 
-    protected List<Sequence> sequences;
+    protected List<TokenSequence> sequences;
 
     /**
      * Create a new reader for the given path
      * @param path the path to read data from
      * @param ignoreTags tags marking tokens to be skipped over
      */
-    public SequenceCorpusReader(String path, String[] ignoreTags) throws IOException {
-        sequences = new LinkedList<Sequence>();
+    public TokenSequenceCorpusReader(String path, String[] ignoreTags) throws IOException {
+        sequences = new LinkedList<TokenSequence>();
         loadCorpus(path, ignoreTags);
     }
 
@@ -52,7 +52,7 @@ public class SequenceCorpusReader implements Iterable<Sequence> {
         while ((line = lineReader.readLine()) != null) {
             lineNum++;
             try {
-                sequences.add(new Sequence(line, ignoreTagsSet));
+                sequences.add(new TokenSequence(line, ignoreTagsSet));
             }
             catch (MalformedSequenceException e) {
                 System.err.println("Bad utterance at line " + lineNum + " of file "  + path);
@@ -68,7 +68,7 @@ public class SequenceCorpusReader implements Iterable<Sequence> {
     }
 
     @Override
-    public Iterator<Sequence> iterator() {
+    public Iterator<TokenSequence> iterator() {
         return sequences.iterator();
     }
 }

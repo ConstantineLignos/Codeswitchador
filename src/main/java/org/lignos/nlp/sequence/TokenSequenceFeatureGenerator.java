@@ -32,5 +32,5 @@ public abstract class TokenSequenceFeatureGenerator {
      * @param seq the input sequence
      * @param index the index in the sequence to use for feature extraction
      */
-    public abstract List<String> genTokenFeatures(Sequence seq, int index);
+    public abstract List<String> genTokenFeatures(TokenSequence seq, int index);
 }

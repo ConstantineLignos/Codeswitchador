@@ -43,16 +43,16 @@ public class FeatureSequenceCorpusReader implements Iterable<FeatureSequence> {
     }
 
     public static FeatureSequenceCorpusReader getCorpusFeatures(String path, SequenceFeatureSet featureSet) {
-        SequenceCorpusReader reader = null;
+        TokenSequenceCorpusReader reader = null;
         try {
-            reader = new SequenceCorpusReader(path, Constants.IGNORE_TAGS);
+            reader = new TokenSequenceCorpusReader(path, Constants.IGNORE_TAGS);
         } catch (IOException err) {
             System.err.println("Could not open input file: " + path);
             System.exit(1);
         }
 
         LinkedList<FeatureSequence> featureSequences = new LinkedList<FeatureSequence>();
-        for (Sequence seq : reader) {
+        for (TokenSequence seq : reader) {
                 featureSequences.add(FeatureSequence.generateFeatures(seq, featureSet));
         }
         return new FeatureSequenceCorpusReader(featureSequences);

@@ -80,7 +80,7 @@ public class FeatureSequence {
      * @param featureSet feature set to use
      * @return the feature sequence
      */
-    public static FeatureSequence generateFeatures(Sequence seq, SequenceFeatureSet featureSet) {
+    public static FeatureSequence generateFeatures(TokenSequence seq, SequenceFeatureSet featureSet) {
         // Accumulate labels
         String[] labels = new String[seq.size()];
         for (int i = 0; i < seq.size(); i++) {

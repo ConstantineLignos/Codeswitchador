@@ -19,8 +19,8 @@ package org.lignos.nlp.codeswitching;
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import gnu.trove.map.hash.THashMap;
 import org.lignos.nlp.codeswitching.hmm.*;
-import org.lignos.nlp.sequence.Sequence;
-import org.lignos.nlp.sequence.SequenceCorpusReader;
+import org.lignos.nlp.sequence.TokenSequence;
+import org.lignos.nlp.sequence.TokenSequenceCorpusReader;
 import org.lignos.nlp.sequence.TokenTag;
 
 import java.io.IOException;
@@ -102,9 +102,9 @@ public class HMMCodeswitchador {
 
         // Label the test corpus
         System.out.println("Evaluating...");
-        SequenceCorpusReader test = null;
+        TokenSequenceCorpusReader test = null;
         try {
-            test = new SequenceCorpusReader(testPath, Constants.IGNORE_TAGS);
+            test = new TokenSequenceCorpusReader(testPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open input file: " + testPath);
             System.exit(1);
@@ -114,7 +114,7 @@ public class HMMCodeswitchador {
 		int misses = 0;
         int oovHits = 0;
         int oovMisses = 0;
-		for (Sequence utt : test) {
+		for (TokenSequence utt : test) {
 			// Get observations for every word
 			List<TokenObservation> uttObs = new LinkedList<TokenObservation>();
 			for (TokenTag ts : utt) {

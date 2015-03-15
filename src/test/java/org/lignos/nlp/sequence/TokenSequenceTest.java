@@ -26,14 +26,14 @@ import static org.junit.Assert.assertEquals;
  * Test Sequence.
  *
  */
-public class SequenceTest {
+public class TokenSequenceTest {
 
     /**
      * Test simple tags
      */
     @Test
     public void testBasicTags() throws Exception {
-        Sequence seq = new Sequence("a/d ab/de abc/def", null);
+        TokenSequence seq = new TokenSequence("a/d ab/de abc/def", null);
         assertArrayEquals(new String[]{"d", "de", "def"}, seq.getLabels());
     }
 
@@ -42,7 +42,7 @@ public class SequenceTest {
      */
     @Test
     public void testBasicTokens() throws Exception {
-        Sequence seq = new Sequence("a/a ab/b abc/c", null);
+        TokenSequence seq = new TokenSequence("a/a ab/b abc/c", null);
         assertEquals(seq.get(0).token, "a");
         assertEquals(seq.get(1).token, "ab");
         assertEquals(seq.get(2).token, "abc");
@@ -53,7 +53,7 @@ public class SequenceTest {
      */
     @Test
     public void testDashTags() throws Exception {
-        Sequence seq = new Sequence("a/d-g ab/de-gh abc/def-ghi", null);
+        TokenSequence seq = new TokenSequence("a/d-g ab/de-gh abc/def-ghi", null);
         assertArrayEquals(new String[]{"d", "de", "def"}, seq.getLabels());
         assertEquals(seq.get(0).comment, "g");
         assertEquals(seq.get(1).comment, "gh");
@@ -68,7 +68,7 @@ public class SequenceTest {
      */
     @Test
     public void testMultiSlash() throws Exception {
-        Sequence seq = new Sequence("a/w/d ab/x/de abc/y/def", null);
+        TokenSequence seq = new TokenSequence("a/w/d ab/x/de abc/y/def", null);
         assertArrayEquals(new String[]{"d", "de", "def"}, seq.getLabels());
         assertEquals(seq.get(0).token, "a/w");
         assertEquals(seq.get(1).token, "ab/x");

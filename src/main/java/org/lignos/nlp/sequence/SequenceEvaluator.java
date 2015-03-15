@@ -29,9 +29,9 @@ import java.util.Map;
 public class SequenceEvaluator {
 
     // Data to compare
-    private SequenceCorpusReader goldReader;
-    private SequenceCorpusReader predReader;
-    private final SequenceCorpusReader trainReader;
+    private TokenSequenceCorpusReader goldReader;
+    private TokenSequenceCorpusReader predReader;
+    private final TokenSequenceCorpusReader trainReader;
 
     // Overall hit/misses
     private int hits;
@@ -58,8 +58,8 @@ public class SequenceEvaluator {
      * @param predReader reader for incorrect labels
      * @param trainReader reader for training data, which may be null if OOV counts are not needed
      */
-    public SequenceEvaluator(SequenceCorpusReader goldReader, SequenceCorpusReader predReader,
-                             SequenceCorpusReader trainReader) {
+    public SequenceEvaluator(TokenSequenceCorpusReader goldReader, TokenSequenceCorpusReader predReader,
+                             TokenSequenceCorpusReader trainReader) {
         this.goldReader = goldReader;
         this.predReader = predReader;
         this.trainReader = trainReader;
@@ -76,24 +76,24 @@ public class SequenceEvaluator {
     }
 
     public static SequenceEvaluator getFromPaths(String goldPath, String predPath, String trainPath) {
-        SequenceCorpusReader goldReader = null;
+        TokenSequenceCorpusReader goldReader = null;
         try {
-            goldReader = new SequenceCorpusReader(goldPath, Constants.IGNORE_TAGS);
+            goldReader = new TokenSequenceCorpusReader(goldPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open input file: " + goldPath);
             System.exit(1);
         }
-        SequenceCorpusReader predReader = null;
+        TokenSequenceCorpusReader predReader = null;
         try {
-            predReader = new SequenceCorpusReader(predPath, Constants.IGNORE_TAGS);
+            predReader = new TokenSequenceCorpusReader(predPath, Constants.IGNORE_TAGS);
         } catch (IOException e) {
             System.err.println("Could not open input file: " + predPath);
             System.exit(1);
         }
-        SequenceCorpusReader trainReader = null;
+        TokenSequenceCorpusReader trainReader = null;
         if (trainPath != null) {
             try {
-                trainReader = new SequenceCorpusReader(trainPath, Constants.IGNORE_TAGS);
+                trainReader = new TokenSequenceCorpusReader(trainPath, Constants.IGNORE_TAGS);
             } catch (IOException e) {
                 System.err.println("Could not open input file: " + trainPath);
                 System.exit(1);
@@ -110,7 +110,7 @@ public class SequenceEvaluator {
     public void eval(boolean ignoreComment) {
         // Do a first pass to build the vocabulary. We lowercase on the way in
         if (trainReader != null) {
-            for (Sequence seq : trainReader) {
+            for (TokenSequence seq : trainReader) {
                 for (TokenTag token : seq) {
                     String tokenLower = token.token.toLowerCase();
                     trainCounts.put(tokenLower, trainCounts.getOrDefault(tokenLower, 0) + 1);
@@ -119,13 +119,13 @@ public class SequenceEvaluator {
         }
 
         // We verified on construction that the two corpora on the same length so we can assume that throughout.
-        Iterator<Sequence> goldIter = goldReader.iterator();
-        Iterator<Sequence> predIter = predReader.iterator();
+        Iterator<TokenSequence> goldIter = goldReader.iterator();
+        Iterator<TokenSequence> predIter = predReader.iterator();
         int seqCount = 0;
         while (goldIter.hasNext()) {
             // Get next sequences
-            Sequence goldSeq = goldIter.next();
-            Sequence predSeq = predIter.next();
+            TokenSequence goldSeq = goldIter.next();
+            TokenSequence predSeq = predIter.next();
             seqCount++;
 
             // Verify that the lengths match

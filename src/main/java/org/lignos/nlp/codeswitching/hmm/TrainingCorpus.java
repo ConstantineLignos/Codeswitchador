@@ -1,14 +1,14 @@
 package org.lignos.nlp.codeswitching.hmm;
 
 import org.lignos.nlp.codeswitching.Constants;
-import org.lignos.nlp.sequence.Sequence;
-import org.lignos.nlp.sequence.SequenceCorpusReader;
+import org.lignos.nlp.sequence.TokenSequence;
+import org.lignos.nlp.sequence.TokenSequenceCorpusReader;
 import org.lignos.nlp.sequence.TokenTag;
 
 import java.io.IOException;
 import java.util.*;
 
-public class TrainingCorpus extends SequenceCorpusReader {
+public class TrainingCorpus extends TokenSequenceCorpusReader {
 
 	public TrainingCorpus(String path, String[] ignoreTags) throws IOException {
 		super(path, Constants.IGNORE_TAGS);
@@ -55,7 +55,7 @@ public class TrainingCorpus extends SequenceCorpusReader {
 		}
 
 		// Count it up
-		for (Sequence utt : this) {
+		for (TokenSequence utt : this) {
 			// Track our index in the utterance so we can get inits right
 			boolean first = true;
 			String lastState = null;

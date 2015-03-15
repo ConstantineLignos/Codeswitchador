@@ -20,8 +20,8 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import org.lignos.nlp.sequence.SequenceFeatureSet;
 import org.lignos.nlp.util.CollectionsUtil;
-import org.lignos.nlp.sequence.Sequence;
-import org.lignos.nlp.sequence.SequenceCorpusReader;
+import org.lignos.nlp.sequence.TokenSequence;
+import org.lignos.nlp.sequence.TokenSequenceCorpusReader;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -70,7 +70,7 @@ public class Perceptron {
      * @param iterations number of iterations in training
      * @param reader data to use for training
      */
-    public float[] train(int iterations, SequenceCorpusReader reader, boolean debug) {
+    public float[] train(int iterations, TokenSequenceCorpusReader reader, boolean debug) {
         // Initialize
         weights = new THashMap<String, Map<String, Double>>();
         totalWeights = new THashMap<String, Map<String, Double>>();
@@ -91,7 +91,7 @@ public class Perceptron {
             int misses = 0;
 
             // Sequences
-            for (Sequence seq : reader) {
+            for (TokenSequence seq : reader) {
                 // Count each sequence
                 examples += 1;
                 // Get labels and features
@@ -177,13 +177,13 @@ public class Perceptron {
      * @param reader data to use for training
      * @param output destination for writing output data, may be null if no output is needed
      */
-    public float test(SequenceCorpusReader reader, PrintWriter output) {
+    public float test(TokenSequenceCorpusReader reader, PrintWriter output) {
         // Count hits/misses
         int hits = 0;
         int misses = 0;
 
         // Sequences
-        for (Sequence seq : reader) {
+        for (TokenSequence seq : reader) {
             // Get labels and features
             String[] labels = seq.getLabels();
 
@@ -227,7 +227,7 @@ public class Perceptron {
      * @param timestamp training timestamp
      * @param debug whether to output debug information
      */
-    private void update(String[] predictions, String[] labels, Sequence seq,
+    private void update(String[] predictions, String[] labels, TokenSequence seq,
                         int timestamp, boolean debug) {
         if (debug && !Arrays.equals(predictions, labels)) {
             System.out.println("Pred: " + Arrays.toString(predictions));
@@ -296,11 +296,11 @@ public class Perceptron {
      * @param seq the sequence to predict for
      * @return the predicted labels
      */
-    private String[] predict(Sequence seq) {
+    private String[] predict(TokenSequence seq) {
         return greedy ? greedyPredict(seq) : viterbiPredict(seq);
     }
 
-    private String[] viterbiPredict(Sequence seq) {
+    private String[] viterbiPredict(TokenSequence seq) {
         // If we're in training, never use averaged weights
         int length = seq.size();
 
@@ -420,7 +420,7 @@ public class Perceptron {
         return score;
     }
 
-    private String[] greedyPredict(Sequence seq) {
+    private String[] greedyPredict(TokenSequence seq) {
         String[] predictions = new String[seq.size()];
         // Loop over tokens
         for (int i = 0; i < seq.size(); i++) {

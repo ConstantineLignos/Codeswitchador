@@ -20,9 +20,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
-import org.lignos.nlp.sequence.Sequence;
+import org.lignos.nlp.sequence.TokenSequence;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -45,7 +44,7 @@ public class TokenContextFeatureGeneratorTest {
      */
     @Test
     public void testGenerateCurrent() throws Exception {
-        Sequence seq = new Sequence("a/a b/a c/a", null);
+        TokenSequence seq = new TokenSequence("a/a b/a c/a", null);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(0);
         // First token
         features = gen.genTokenFeatures(seq, 0);
@@ -65,7 +64,7 @@ public class TokenContextFeatureGeneratorTest {
     */
     @Test
     public void testGeneratePrevMiddle() throws Exception {
-        Sequence seq = new Sequence("a/a b/a c/a", null);
+        TokenSequence seq = new TokenSequence("a/a b/a c/a", null);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(-1);
         features = gen.genTokenFeatures(seq, 1);
         assertArrayEquals(new String[]{"TOK-1:a"}, features.toArray());
@@ -76,7 +75,7 @@ public class TokenContextFeatureGeneratorTest {
      */
     @Test
     public void testGeneratePrevStart() throws Exception {
-        Sequence seq = new Sequence("a/a b/a c/a", null);
+        TokenSequence seq = new TokenSequence("a/a b/a c/a", null);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(-1);
         features = gen.genTokenFeatures(seq, 0);
         assertArrayEquals(new String[]{}, features.toArray());
@@ -87,7 +86,7 @@ public class TokenContextFeatureGeneratorTest {
      */
     @Test
     public void testGenerateNextMiddle() throws Exception {
-        Sequence seq = new Sequence("a/a b/a c/a", null);
+        TokenSequence seq = new TokenSequence("a/a b/a c/a", null);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(1);
         features = gen.genTokenFeatures(seq, 1);
         assertArrayEquals(new String[]{"TOK1:c"}, features.toArray());
@@ -98,7 +97,7 @@ public class TokenContextFeatureGeneratorTest {
      */
     @Test
     public void testGenerateNextEnd() throws Exception {
-        Sequence seq = new Sequence("a/a b/a c/a", null);
+        TokenSequence seq = new TokenSequence("a/a b/a c/a", null);
         TokenContextFeatureGenerator gen = new TokenContextFeatureGenerator(1);
         features = gen.genTokenFeatures(seq, 2);
         assertArrayEquals(new String[]{}, features.toArray());

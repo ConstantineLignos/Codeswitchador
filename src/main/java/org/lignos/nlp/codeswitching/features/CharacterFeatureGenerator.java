@@ -19,7 +19,7 @@ package org.lignos.nlp.codeswitching.features;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import org.lignos.nlp.sequence.TokenSequenceFeatureGenerator;
-import org.lignos.nlp.sequence.Sequence;
+import org.lignos.nlp.sequence.TokenSequence;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class CharacterFeatureGenerator extends TokenSequenceFeatureGenerator {
     }
 
     @Override
-    public List<String> genTokenFeatures(Sequence seq, int index) {
+    public List<String> genTokenFeatures(TokenSequence seq, int index) {
         // Return cached features if available
         String token = seq.get(index).token.toLowerCase();
         List<String> features = cache.get(token);

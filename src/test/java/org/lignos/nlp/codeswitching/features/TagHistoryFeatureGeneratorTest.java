@@ -19,9 +19,8 @@ package org.lignos.nlp.codeswitching.features;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
-import org.lignos.nlp.sequence.Sequence;
+import org.lignos.nlp.sequence.TokenSequence;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -47,7 +46,7 @@ public class TagHistoryFeatureGeneratorTest {
      */
     @Test
     public void testGenerateMiddle() throws Exception {
-        Sequence seq = new Sequence("a/a b/b c/c", null);
+        TokenSequence seq = new TokenSequence("a/a b/b c/c", null);
         String[] labels = seq.getLabels();
 
         TagHistoryFeatureGenerator gen1 = new TagHistoryFeatureGenerator(1);
@@ -69,7 +68,7 @@ public class TagHistoryFeatureGeneratorTest {
      */
     @Test
     public void testGenerateStart() throws Exception {
-        Sequence seq = new Sequence("a/a b/b c/c", null);
+        TokenSequence seq = new TokenSequence("a/a b/b c/c", null);
         String[] labels = seq.getLabels();
 
         TagHistoryFeatureGenerator gen1 = new TagHistoryFeatureGenerator(1);

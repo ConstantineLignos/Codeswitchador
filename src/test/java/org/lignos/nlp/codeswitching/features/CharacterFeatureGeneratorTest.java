@@ -20,10 +20,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
-import org.lignos.nlp.sequence.Sequence;
+import org.lignos.nlp.sequence.TokenSequence;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -48,7 +47,7 @@ public class CharacterFeatureGeneratorTest {
      */
     @Test
     public void testAddFeatures1() throws Exception {
-        Sequence seq = new Sequence("a/a ab/a abc/a", null);
+        TokenSequence seq = new TokenSequence("a/a ab/a abc/a", null);
         CharacterFeatureGenerator gen1 = new CharacterFeatureGenerator(1);
 
         features = gen1.genTokenFeatures(seq, 0);
@@ -71,7 +70,7 @@ public class CharacterFeatureGeneratorTest {
      */
     @Test
     public void testAddFeatures2() throws Exception {
-        Sequence seq = new Sequence("abcd/a", null);
+        TokenSequence seq = new TokenSequence("abcd/a", null);
         CharacterFeatureGenerator gen2 = new CharacterFeatureGenerator(2);
 
         features = gen2.genTokenFeatures(seq, 0);

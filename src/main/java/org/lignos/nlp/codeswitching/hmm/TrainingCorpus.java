@@ -103,7 +103,9 @@ public class TrainingCorpus extends TokenSequenceCorpusReader {
 			}
 		}
 
-		// Sanity check
+		// Sanity check: this has only been tested with a small number of states such that you are all but guaranteed
+		// to get exact sums to 1
+        // TODO: Add a tolerance to the check
 		double piSum = 0;
 		for (int i = 0; i < states.length; i++) {
 			piSum += pi[i];

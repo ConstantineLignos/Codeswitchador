@@ -64,6 +64,12 @@ public class TrainingCorpus extends TokenSequenceCorpusReader {
                 if (nonStateSet.contains(tokenTag.tag)) {
 					continue;
 				}
+
+                // Check if we don't know about this tag
+                if (!initCounts.containsKey(tokenTag.tag)) {
+                    throw new RuntimeException("Tag '" + tokenTag.tag + "' does not correspond to any known state.");
+                }
+
 				// Init if first, transition otherwise
 				if (first) {
                     initCounts.put(tokenTag.tag, initCounts.get(tokenTag.tag) + 1);

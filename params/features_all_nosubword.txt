@@ -1,0 +1,6 @@
+token0
+token-1
+token+1
+tag-1
+tag-2
+length

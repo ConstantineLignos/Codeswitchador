@@ -4,3 +4,4 @@ Nolength	params/features_all_nolength.txt
 Nosuffix	params/features_all_nosuffix.txt
 Notagcontext	params/features_all_notagcontext.txt
 Notokencontext	params/features_all_notokencontext.txt
+Nosubword	params/features_all_nosubword.txt

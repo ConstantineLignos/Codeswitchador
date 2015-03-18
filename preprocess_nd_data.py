@@ -27,9 +27,9 @@ import argparse
 
 TAG_DELIM = '/'
 TAG_MAP = {
-    'tr': 'r',
-    'nl': 'l',
-    'skip': 'n'
+    'tr': 'tur',
+    'nl': 'nld',
+    'skip': 'zxx'
 }
 
 

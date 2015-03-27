@@ -67,8 +67,10 @@ def split_token(tokentag, remove_entities=True):
         raise ValueError('No token/tag seperator: %r' % tokentag)
     token = tokentag[:lastslash]
     tag = tokentag[lastslash + 1:]
-    if not tag or not token:
-        raise ValueError("Bad token/tag: %r" % tokentag)
+    if not tag:
+        raise ValueError("Empty tag: %r" % tokentag)
+    if not token:
+        raise ValueError("Empty token: %r" % tokentag)
     if remove_entities and contains_entity(tag):
         # You can't do deletion on unicode strings with a translation table, alas
         tag = clean_entities(tag)

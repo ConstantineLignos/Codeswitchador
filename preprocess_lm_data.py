@@ -6,6 +6,9 @@ Constantine Lignos and Mitchell Marcus. Toward web-scale analysis of
 codeswitching. Poster at the 87th Annual Meeting of the Linguistic
 Society of America, January 5, 2013.
 
+The script was also extended to cover Hindi/English data from the
+University of Pennsylvania.
+
 The source data is of the format:
 word1/tag word2/tag
 
@@ -20,6 +23,7 @@ language code for the languages, a dashtag used for entities, and
 
 The mapping of languages is as follows:
        English(e): eng
+         Hindi(h): hin
        Spanish(s): spa
          Other(o): unk
 Non-linguistic(n): zxx
@@ -53,6 +57,7 @@ from eval_codeswitch import split_token
 TAG_DASH = '-'
 LANG_MAPPING = {
     'e': 'eng',
+    'h': 'hin',
     's': 'spa',
     'o': 'unk',
     'n': 'zxx',
@@ -73,7 +78,7 @@ def transform_tag(tag):
     try:
         lang = LANG_MAPPING[tag[0]]
     except KeyError:
-        raise ValueError('Could not map language from tag: {!r}'.format(tag))
+        raise ValueError('Could not find language from tag: {!r}'.format(tag))
 
     # Add a dash tag if needed
     if len(tag) == 2:
@@ -93,19 +98,33 @@ def preprocess(input_path, output_path):
     output_file = codecs.open(output_path, 'w', 'utf-8')
 
     linenum = 0
-    for line in input_file:
+    while True:
         linenum += 1
+        try:
+            line = input_file.next()
+        except StopIteration:
+            break
+        except UnicodeDecodeError as err:
+            print('Unicode decoding error on line {}: {}'.format(linenum, err),
+                  file=sys.stderr)
+            break
 
         # Split up the line
         splits = line.split()
 
         # Extract and transform token and tag pairs
-        token_tags = [split_token(item, False) for item in splits]
+        try:
+            token_tags = [split_token(item, False) for item in splits]
+        except ValueError as err:
+            print('Tag parsing error on line {}: {}'.format(linenum, err),
+                  file=sys.stderr)
+            continue
+
         try:
             new_token_tags = [(token, transform_tag(tag))
                               for token, tag in token_tags]
         except ValueError as err:
-            print('Error reading line {}: {}'.format(linenum, err),
+            print('Tag conversion error on line {}: {}'.format(linenum, err),
                   file=sys.stderr)
             continue
 
